@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+:root {
+  --burgundy: #512B32;
+  --gold: #D5B47A;
+  --cream: #FFF2E7;
+  --rose: #C99C91;
+  --wine: #342025;
+  --text-2: #5A4A4D;
+}
+
+html { background: var(--cream); color: var(--wine); }
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  background: var(--cream);
+  color: var(--wine);
+  margin: 0;
+}
+
+.font-serif { font-family: var(--font-serif), Georgia, serif; }
+@keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } } .animate-aurora { animation: aurora 60s linear infinite; }
