@@ -12,6 +12,7 @@ export function PerfectTogether() {
 
   useEffect(() => {
     const supabase = createClient();
+    if (!supabase) return;
     supabase.from("perfect_together").select("item_a_id,item_b_id").order("display_order", { ascending: true })
       .then(({ data }) => setPairings((data || []).map((d: any) => ({ a: d.item_a_id, b: d.item_b_id }))));
   }, []);

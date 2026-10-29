@@ -48,6 +48,7 @@ export function CartDrawer() {
       // try supabase
       try {
         const supabase = createClient();
+        if (!supabase) { alert("WhatsApp number not configured."); return; }
         const { data, error } = await supabase.from("cafe_settings").select("whatsapp_number").limit(1).single();
         if (error) { console.error(error); alert("Could not load WhatsApp configuration."); return; }
         const n = (data?.whatsapp_number || "").replace(/[^\d]/g, "");

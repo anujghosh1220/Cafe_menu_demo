@@ -12,6 +12,7 @@ export function FeaturedDishes() {
 
   useEffect(() => {
     const supabase = createClient();
+    if (!supabase) return;
     supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true })
       .then(({ data }) => setIds((data || []).map((d: any) => d.menu_item_id)));
   }, []);
