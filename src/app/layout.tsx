@@ -10,10 +10,14 @@ export const metadata: Metadata = {
   description: "Digital menu for Maison Elise cafe.",
 };
 
+import { CartProvider } from "@/components/cart-provider";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }

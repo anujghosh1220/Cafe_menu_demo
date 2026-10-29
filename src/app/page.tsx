@@ -6,7 +6,10 @@ import { MenuHero } from "@/components/menu-hero";
 import { CategoryNavigation } from "@/components/category-navigation";
 import { MenuSearch } from "@/components/menu-search";
 import { MenuSection } from "@/components/menu-section";
+import { FeaturedDishes } from "@/components/featured-dishes";
+import { PerfectTogether } from "@/components/perfect-together";
 import { MenuFooter } from "@/components/menu-footer";
+import { CartDrawer } from "@/components/cart-drawer";
 import { menuCategories } from "@/data/menu";
 import { searchItems, itemsByCategory } from "@/lib/menu-utils";
 
@@ -14,10 +17,13 @@ export default function Home() {
   const [query, setQuery] = useState("");
 
   return (
+    <>
     <AuroraBackground className="min-h-screen justify-start">
       <main className="w-full max-w-[1320px] mx-auto px-6" id="top">
         <MenuHeader />
         <MenuHero />
+        <FeaturedDishes />
+        <PerfectTogether />
         <div className="my-4" id="menu">
           <MenuSearch value={query} onChange={setQuery} />
         </div>
@@ -44,5 +50,7 @@ export default function Home() {
         <MenuFooter />
       </main>
     </AuroraBackground>
+    <CartDrawer />
+    </>
   );
 }
