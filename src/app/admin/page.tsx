@@ -8,6 +8,7 @@ export default function AdminPage() {
   const { state, setState } = useAdmin();
   const [tab, setTab] = useState<"menu" | "tables" | "settings" | "favourites" | "pairings">("menu");
   const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
   const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "saving" | "">("");
   useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
