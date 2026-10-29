@@ -24,7 +24,7 @@ export function CartDrawer() {
   const [checkoutClosing, setCheckoutClosing] = useState(false);
   const closeCheckout = () => {
     setCheckoutClosing(true);
-    setTimeout(() => { closeCheckout(); setCheckoutClosing(false); }, 200);
+    setTimeout(() => { setCheckout(false); setCheckoutClosing(false); }, 200);
   };
 
   const [table, setTable] = useState("");
