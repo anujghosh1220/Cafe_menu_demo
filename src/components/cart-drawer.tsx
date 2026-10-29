@@ -74,8 +74,8 @@ Please confirm availability and order acceptance.`;
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex justify-end">
-          <div className="bg-[#FFF2E7] w-full max-w-md h-full p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 flex justify-end animate-fade-in">
+          <div className="bg-[#FFF2E7] w-full max-w-md h-full p-4 overflow-y-auto animate-slide-in-right">
             <div className="flex justify-between items-center">
               <h2 className="font-serif text-xl text-[#512B32]">Your Cart</h2>
               <button onClick={() => setOpen(false)}>Close</button>
