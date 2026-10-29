@@ -21,10 +21,8 @@ export function CartDrawer() {
   };
   const [checkout, setCheckout] = useState(false);
 
-  const [name, setName] = useState("");
-  const [type, setType] = useState<"takeaway" | "delivery">("takeaway");
+  const [table, setTable] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -37,9 +35,8 @@ export function CartDrawer() {
 
   const submit = () => {
     const e: Record<string, string> = {};
-    if (!name.trim()) e.name = "Name required";
+    if (!table) e.table = "Table required";
     if (!phone.trim()) e.phone = "Phone required";
-    if (type === "delivery" && !address.trim()) e.address = "Address required";
     setErrors(e);
     if (Object.keys(e).length) return;
     if (!validWhatsapp(whatsappNumber)) {
@@ -49,21 +46,17 @@ export function CartDrawer() {
     const itemsText = resolved
       .map((r, i) => `${i + 1}. ${r.item.name} x ${r.quantity} - ${formatINR(r.lineTotal)}`)
       .join("\n");
-    const msg = `Maison Elise - New Order
+    const msg = `NEW DINE-IN ORDER - MAISON ELISE
 
-Customer: ${name}
-Order type: ${type}
+Table: ${table}
 Phone: ${phone}
 
-Items:
+ORDER ITEMS
 ${itemsText}
 
-Subtotal: ${formatINR(subtotal)}
-Additional charges: ${formatINR(0)}
-Total: ${formatINR(subtotal)}
+Total: ${formatINR(subtotal)}${notes.trim() ? `
 
-Delivery address: ${type === "delivery" ? address : "N/A"}
-Special instructions: ${notes || "None"}
+Special Instructions: ${notes}` : ""}
 
 Please confirm availability and order acceptance.`;
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
@@ -121,32 +114,24 @@ Please confirm availability and order acceptance.`;
             <h2 className="font-serif text-xl text-[#512B32]">Checkout</h2>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="text-sm">Name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2" />
-                {errors.name && <p className="text-xs text-red-700">{errors.name}</p>}
-              </div>
-              <div>
-                <label className="text-sm">Order type</label>
-                <select value={type} onChange={(e) => setType(e.target.value as any)} className="w-full border border-[#D5B47A]/40 p-2">
-                  <option value="takeaway">Takeaway</option>
-                  <option value="delivery">Delivery</option>
+                <label className="text-sm">Table Number</label>
+                <select value={table} onChange={(e) => setTable(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2">
+                  <option value="">Select a table</option>
+                  <option value="Table 1">Table 1</option>
+                  <option value="Table 2">Table 2</option>
+                  <option value="Table 3">Table 3</option>
+                  <option value="Table 4">Table 4</option>
+                  <option value="Table 5">Table 5</option>
                 </select>
+                {errors.table && <p className="text-xs text-red-700">{errors.table}</p>}
               </div>
               <div>
                 <label className="text-sm">Phone</label>
                 <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2" />
                 {errors.phone && <p className="text-xs text-red-700">{errors.phone}</p>}
               </div>
-              {type === "delivery" && (
-                <div>
-                  <label className="text-sm">Delivery address</label>
-                  <textarea value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2" />
-                  {errors.address && <p className="text-xs text-red-700">{errors.address}</p>}
-                  <p className="text-xs text-[#5A4A4D] mt-1">Delivery availability, charges, and minimums must be confirmed by the cafe.</p>
-                </div>
-              )}
               <div>
-                <label className="text-sm">Special instructions</label>
+                <label className="text-sm">Special Instructions (Optional)</label>
                 <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2" />
               </div>
               <p className="text-sm text-[#342025]">Total: {formatINR(subtotal)}</p>
