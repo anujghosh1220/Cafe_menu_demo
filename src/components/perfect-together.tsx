@@ -27,7 +27,7 @@ export function PerfectTogether() {
       <p className="text-sm text-[#5A4A4D] mt-1">A little something to make your favourite even better.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {resolved.map((p: any, i: number) => (
-          <div key={i} className="border border-[#D5B47A]/40 p-4">
+          <div key={i} className="border border-[#D5B47A]/40 p-4 bg-[#FFF2E7]">
             <p className="text-[#342025] font-medium">{p.a.name} + {p.b.name}</p>
             <p className="text-sm text-[#5A4A4D] mt-1">{p.reason}</p>
             <div className="flex items-center justify-between mt-3">

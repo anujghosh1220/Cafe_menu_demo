@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-    <AuroraBackground className="min-h-screen justify-start">
+    <AuroraBackground className="min-h-screen justify-start" showRadialGradient={false}>
       <main className="w-full max-w-[1320px] mx-auto px-6" id="top">
         <MenuHeader />
         <MenuHero />

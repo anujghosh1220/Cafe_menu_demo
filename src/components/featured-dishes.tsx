@@ -18,8 +18,8 @@ export function FeaturedDishes() {
       <p className="text-sm text-[#5A4A4D] mt-1">A few things we think you'll love.</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         {items.map((item: any) => (
-          <a key={item.id} href={`#${item.id}`} className="border border-[#D5B47A]/40 p-4 block">
-            <span className="text-[10px] uppercase tracking-widest text-[#D5B47A]">House Favourite</span>
+          <a key={item.id} href={`#${item.id}`} className="border border-[#D5B47A]/40 p-4 block bg-[#FFF2E7]">
+            <span className="text-[10px] uppercase tracking-widest text-[#512B32]">House Favourite</span>
             <h3 className="font-medium text-[#342025] mt-2">{item.name}</h3>
             <p className="text-sm text-[#5A4A4D] mt-1">{item.description}</p>
             <div className="flex items-center justify-between mt-3">
