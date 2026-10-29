@@ -1,12 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAdmin } from "@/components/admin-provider";
 import type { MenuItem } from "@/data/menu";
 
 export default function AdminPage() {
   const { state, setState } = useAdmin();
   const [tab, setTab] = useState<"menu" | "tables" | "settings">("menu");
-  const [name, setName] = useState("");
+  useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
+  const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "">("");
+
+  const normalizeWa = (v: string) => v.replace(/[^\d]/g, "");
+  const saveWa = () => {
+    const n = normalizeWa(waInput.trim());
+    if (n.length < 10) { setWaStatus("invalid"); return; }
+    setState({ ...state, whatsapp: n });
+    setWaStatus("saved");
+  };
+
+  const waChanged = normalizeWa(waInput.trim()) !== state.whatsapp;
   const [price, setPrice] = useState("");
   const [cat, setCat] = useState(state.categories[0].id);
   const [desc, setDesc] = useState("");
@@ -100,9 +111,17 @@ export default function AdminPage() {
 
       {tab === "settings" && (
         <section className="mt-6 space-y-2">
-          <label className="text-sm">WhatsApp number (digits only, with country code)</label>
-          <input value={state.whatsapp} onChange={(e)=>setState({...state, whatsapp: e.target.value})} className="w-full border p-2" />
-          <p className="text-xs text-[#5A4A4D]">Example: 919876543210</p>
+          <label className="text-sm">WhatsApp Number (with country code)</label>
+          <input placeholder="919876543210" value={waInput} onChange={(e) => { setWaInput(e.target.value); setWaStatus(waChanged ? "unsaved" : ""); }} className="w-full border p-2" />
+          <p className="text-xs text-[#5A4A4D]">Enter the country code followed by your number, without the + sign or spaces.</p>
+          <button onClick={saveWa} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Save WhatsApp Number</button>
+          <p className="text-xs">
+            {waStatus === "saved" && <span className="text-green-700">Saved and configured: ••••••{state.whatsapp.slice(-4)}</span>}
+            {waStatus === "unsaved" && <span className="text-[#5A4A4D]">Unsaved changes</span>}
+            {waStatus === "invalid" && <span className="text-red-700">Invalid number</span>}
+            {!waStatus && state.whatsapp && <span className="text-green-700">Saved and configured: ••••••{state.whatsapp.slice(-4)}</span>}
+            {!waStatus && !state.whatsapp && <span className="text-[#5A4A4D]">Not configured</span>}
+          </p>
         </section>
       )}
     </main>
