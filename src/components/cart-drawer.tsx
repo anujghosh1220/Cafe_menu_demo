@@ -20,6 +20,11 @@ export function CartDrawer() {
     setTimeout(() => { setOpen(false); setClosing(false); }, 300);
   };
   const [checkout, setCheckout] = useState(false);
+  const [checkoutClosing, setCheckoutClosing] = useState(false);
+  const closeCheckout = () => {
+    setCheckoutClosing(true);
+    setTimeout(() => { closeCheckout(); setCheckoutClosing(false); }, 200);
+  };
 
   const [table, setTable] = useState("");
   const [phone, setPhone] = useState("");
@@ -106,9 +111,9 @@ Please confirm availability and order acceptance.`;
         </div>
       )}
 
-      {checkout && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="bg-[#FFF2E7] w-full max-w-md p-4 max-h-[90vh] overflow-y-auto">
+      {(checkout || checkoutClosing) && (
+        <div className={`fixed inset-0 z-50 bg-black/50 flex items-center justify-center ${checkoutClosing ? "animate-fade-out" : "animate-fade-in"}`}>
+          <div className={`bg-[#FFF2E7] w-full max-w-md p-4 max-h-[90vh] overflow-y-auto ${checkoutClosing ? "opacity-0 transition-opacity duration-200" : "animate-fade-in"}`}>
             <h2 className="font-serif text-xl text-[#512B32]">Checkout</h2>
             <div className="mt-4 space-y-3">
               <div>
@@ -129,7 +134,7 @@ Please confirm availability and order acceptance.`;
               </div>
               <p className="text-sm text-[#342025]">Total: {formatINR(subtotal)}</p>
               <button onClick={submit} className="w-full py-2 bg-[#512B32] text-[#FFF2E7]">Proceed to Order</button>
-              <button onClick={() => setCheckout(false)} className="w-full py-2 border border-[#D5B47A]/40 text-[#342025]">Back to Cart</button>
+              <button onClick={() => closeCheckout()} className="w-full py-2 border border-[#D5B47A]/40 text-[#342025]">Back to Cart</button>
             </div>
             <p className="text-xs text-[#5A4A4D] mt-3">Opening WhatsApp does not confirm the order. Send the message and wait for cafe confirmation.</p>
           </div>
