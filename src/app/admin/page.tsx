@@ -19,7 +19,7 @@ export default function AdminPage() {
     if (n.length < 10) { setWaStatus("invalid"); return; }
     setWaStatus("saving");
     try {
-      const supabase = createClient();
+      const supabase = createClient()!;
       const { error } = await supabase.from("cafe_settings").update({ whatsapp_number: n }).eq("id", true);
       if (error) { setWaStatus("invalid"); console.error(error); return; }
       setState({ ...state, whatsapp: n });
@@ -41,12 +41,12 @@ export default function AdminPage() {
   const [pairTitle, setPairTitle] = useState("");
 
   const loadFavs = async () => {
-    const supabase = createClient();
+    const supabase = createClient()!;
     const { data } = await supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true });
     setFavIds((data || []).map((d: any) => d.menu_item_id));
   };
   const loadPairs = async () => {
-    const supabase = createClient();
+    const supabase = createClient()!;
     const { data } = await supabase.from("perfect_together").select("id,item_a_id,item_b_id,title").order("display_order", { ascending: true });
     setPairList((data || []).map((d: any) => ({ id: d.id, a: d.item_a_id, b: d.item_b_id, title: d.title || "" })));
   };
@@ -163,7 +163,7 @@ export default function AdminPage() {
             </select>
             <button onClick={async () => {
               if (!favToAdd) return;
-              const supabase = createClient();
+              const supabase = createClient()!;
               await supabase.from("homepage_favourites").insert({ menu_item_id: favToAdd, display_order: favIds.length });
               setFavToAdd(""); loadFavs();
             }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add</button>
@@ -174,7 +174,7 @@ export default function AdminPage() {
               <div key={id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
                 <span className="flex-1">{item?.name || id}</span>
                 <button onClick={async () => {
-                  const supabase = createClient();
+                  const supabase = createClient()!;
                   await supabase.from("homepage_favourites").delete().eq("menu_item_id", id);
                   loadFavs();
                 }} className="text-xs text-red-700">Remove</button>
@@ -199,7 +199,7 @@ export default function AdminPage() {
             <input placeholder="Title" value={pairTitle} onChange={(e)=>setPairTitle(e.target.value)} className="border p-2" />
             <button onClick={async () => {
               if (!pairA || !pairB || pairA === pairB) return;
-              const supabase = createClient();
+              const supabase = createClient()!;
               await supabase.from("perfect_together").insert({ item_a_id: pairA, item_b_id: pairB, title: pairTitle, display_order: pairList.length });
               setPairA(""); setPairB(""); setPairTitle(""); loadPairs();
             }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Pairing</button>
@@ -211,7 +211,7 @@ export default function AdminPage() {
               <div key={p.id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
                 <span className="flex-1">{a?.name} + {b?.name}</span>
                 <button onClick={async () => {
-                  const supabase = createClient();
+                  const supabase = createClient()!;
                   await supabase.from("perfect_together").delete().eq("id", p.id);
                   loadPairs();
                 }} className="text-xs text-red-700">Remove</button>
