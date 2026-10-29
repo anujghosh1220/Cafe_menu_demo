@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { useAdmin } from "@/components/admin-provider";
 import type { MenuItem } from "@/data/menu";
 
@@ -8,7 +9,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<"menu" | "tables" | "settings">("menu");
   const [name, setName] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
-  const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "">("");
+  const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "saving" | "">("");
   useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
 
   const normalizeWa = (v: string) => v.replace(/[^\d]/g, "");
