@@ -16,7 +16,7 @@ export const AuroraBackground = ({
         className,
       )}
     >
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
         <div
           className={cn(
             "pointer-events-none absolute -inset-[10px] opacity-50 blur-[10px] filter will-change-transform",
@@ -27,7 +27,9 @@ export const AuroraBackground = ({
           )}
         />
       </div>
-      {children}
+      <div className="relative w-full" style={{ zIndex: 10 }}>
+        {children}
+      </div>
     </div>
   );
 };
