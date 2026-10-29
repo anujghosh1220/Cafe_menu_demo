@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { useAdmin } from "@/components/admin-provider";
 import type { MenuItem } from "@/data/menu";
 
@@ -12,11 +12,20 @@ export default function AdminPage() {
   useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
 
   const normalizeWa = (v: string) => v.replace(/[^\d]/g, "");
-  const saveWa = () => {
+  const saveWa = async () => {
     const n = normalizeWa(waInput.trim());
     if (n.length < 10) { setWaStatus("invalid"); return; }
-    setState({ ...state, whatsapp: n });
-    setWaStatus("saved");
+    setWaStatus("saving");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from("cafe_settings").update({ whatsapp_number: n }).eq("id", true);
+      if (error) { setWaStatus("invalid"); console.error(error); return; }
+      setState({ ...state, whatsapp: n });
+      setWaStatus("saved");
+    } catch (e) {
+      setWaStatus("invalid");
+      console.error(e);
+    }
   };
 
   const waChanged = normalizeWa(waInput.trim()) !== state.whatsapp;
