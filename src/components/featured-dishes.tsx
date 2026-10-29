@@ -1,16 +1,23 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { useAdmin } from "@/components/admin-provider";
+import { createClient } from "@/lib/supabase/client";
 import { formatINR } from "@/lib/format-currency";
-
-const featuredIds = ["main-course-1", "momos-6", "cold-drinks-1", "desserts-6"];
 
 export function FeaturedDishes() {
   const { add } = useCart();
   const { state } = useAdmin();
-  const items = featuredIds.map((id) => state.items.find((m) => m.id === id)).filter(Boolean) as any;
+  const [ids, setIds] = useState<string[]>([]);
 
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true })
+      .then(({ data }) => setIds((data || []).map((d: any) => d.menu_item_id)));
+  }, []);
 
+  const items = ids.map((id) => state.items.find((m) => m.id === id)).filter(Boolean) as any;
+  if (items.length === 0) return null;
 
   return (
     <section className="py-8">
@@ -32,3 +39,4 @@ export function FeaturedDishes() {
     </section>
   );
 }
+EOF

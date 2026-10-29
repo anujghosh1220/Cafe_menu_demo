@@ -1,25 +1,29 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { useAdmin } from "@/components/admin-provider";
+import { createClient } from "@/lib/supabase/client";
 import { formatINR } from "@/lib/format-currency";
-
-const pairings = [
-  { a: "hot-drinks-1", b: "snacks-5", reason: "A warm, spiced chai balances the crisp, savoury cutlet." },
-  { a: "cold-drinks-1", b: "desserts-2", reason: "Chilled coffee and a rich brownie make a comforting duo." },
-  { a: "momos-1", b: "cold-drinks-3", reason: "Fresh lime soda cuts through the soft, savoury momos." },
-  { a: "main-course-1", b: "rice-biryani-2", reason: "Jeera rice soaks up the rich paneer butter masala gravy." },
-  { a: "desserts-6", b: "hot-drinks-4", reason: "A warm lava cake pairs beautifully with a cappuccino." },
-];
 
 export function PerfectTogether() {
   const { add } = useCart();
   const { state } = useAdmin();
+  const [pairings, setPairings] = useState<{ a: string; b: string }[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from("perfect_together").select("item_a_id,item_b_id").order("display_order", { ascending: true })
+      .then(({ data }) => setPairings((data || []).map((d: any) => ({ a: d.item_a_id, b: d.item_b_id }))));
+  }, []);
+
   const resolved = pairings.map((p) => {
-    const a = state.items.find((m) => m.id === p.a)!;
-    const b = state.items.find((m) => m.id === p.b)!;
+    const a = state.items.find((m) => m.id === p.a);
+    const b = state.items.find((m) => m.id === p.b);
     if (!a || !b) return null;
-    return { ...p, a, b, total: a.price + b.price };
-  }).filter(Boolean) as any;
+    return { a, b, total: a.price + b.price };
+  }).filter(Boolean) as any[];
+
+  if (resolved.length === 0) return null;
 
   return (
     <section className="py-8">
@@ -29,7 +33,6 @@ export function PerfectTogether() {
         {resolved.map((p: any, i: number) => (
           <div key={i} className="border border-[#D5B47A]/40 p-4 bg-[#FFF2E7]">
             <p className="text-[#342025] font-medium">{p.a.name} + {p.b.name}</p>
-            <p className="text-sm text-[#5A4A4D] mt-1">{p.reason}</p>
             <div className="flex items-center justify-between mt-3">
               <span className="text-[#512B32]">{formatINR(p.total)}</span>
               <button onClick={() => { add(p.a.id); add(p.b.id); }} className="text-xs px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add both</button>
@@ -40,3 +43,4 @@ export function PerfectTogether() {
     </section>
   );
 }
+EOF
