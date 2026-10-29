@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-    <AuroraBackground className="min-h-screen justify-start" showRadialGradient={false}>
+    <div className="min-h-screen bg-[#FFF2E7]">
       <main className="w-full max-w-[1320px] mx-auto px-6" id="top">
         <MenuHeader />
         <MenuHero />
@@ -57,7 +57,7 @@ export default function Home() {
         <ReviewsComingSoon />
         <MenuFooter />
       </main>
-    </AuroraBackground>
+    </div>
     <CartDrawer />
     </>
   );
