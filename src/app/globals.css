@@ -1,3 +1,4 @@
+html { scroll-behavior: smooth; }
 @import "tailwindcss";
 
 :root {
@@ -26,3 +27,8 @@ body {
 .animate-slide-in-right { animation: slideInRight 0.25s ease-out; }
 .animate-fade-in { animation: fadeIn 0.2s ease-out; }
 @media (prefers-reduced-motion: reduce) { .animate-slide-in-right, .animate-fade-in { animation: none; } }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+.animate-fade-out { animation: fadeOut 0.2s ease-in; }
+@media (prefers-reduced-motion: reduce) { .animate-fade-out { animation: none; } }

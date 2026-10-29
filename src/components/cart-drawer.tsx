@@ -13,6 +13,12 @@ function validWhatsapp(n: string) {
 export function CartDrawer() {
   const { lines, setQty, remove, clear } = useCart();
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  const close = () => {
+    setClosing(true);
+    setTimeout(() => { setOpen(false); setClosing(false); }, 300);
+  };
   const [checkout, setCheckout] = useState(false);
 
   const [name, setName] = useState("");
@@ -73,12 +79,12 @@ Please confirm availability and order acceptance.`;
         Cart ({count})
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex justify-end animate-fade-in">
-          <div className="bg-[#FFF2E7] w-full max-w-md h-full p-4 overflow-y-auto animate-slide-in-right">
+      {(open || closing) && (
+        <div className={`fixed inset-0 z-50 bg-black/50 flex justify-end ${closing ? "animate-fade-out" : "animate-fade-in"}`}>
+          <div className={`bg-[#FFF2E7] w-full max-w-md h-full p-4 overflow-y-auto ${closing ? "translate-x-full transition-transform duration-300" : "animate-slide-in-right"}`}>
             <div className="flex justify-between items-center">
               <h2 className="font-serif text-xl text-[#512B32]">Your Cart</h2>
-              <button onClick={() => setOpen(false)}>Close</button>
+              <button onClick={close}>Close</button>
             </div>
             {resolved.length === 0 ? (
               <p className="mt-6 text-[#5A4A4D]">Your cart is empty.</p>
