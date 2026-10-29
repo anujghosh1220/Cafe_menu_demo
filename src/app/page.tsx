@@ -8,6 +8,7 @@ import { MenuSearch } from "@/components/menu-search";
 import { MenuSection } from "@/components/menu-section";
 import { FeaturedDishes } from "@/components/featured-dishes";
 import { PerfectTogether } from "@/components/perfect-together";
+import { ReviewsComingSoon } from "@/components/reviews-coming-soon";
 import { MenuFooter } from "@/components/menu-footer";
 import { CartDrawer } from "@/components/cart-drawer";
 import { menuCategories } from "@/data/menu";
@@ -47,6 +48,7 @@ export default function Home() {
             ))
           )}
         </div>
+        <ReviewsComingSoon />
         <MenuFooter />
       </main>
     </AuroraBackground>
