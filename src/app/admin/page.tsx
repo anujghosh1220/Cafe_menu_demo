@@ -41,12 +41,14 @@ export default function AdminPage() {
   const [pairTitle, setPairTitle] = useState("");
 
   const loadFavs = async () => {
-    const supabase = createClient()!;
+    const supabase = createClient();
+    if (!supabase) return;
     const { data } = await supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true });
     setFavIds((data || []).map((d: any) => d.menu_item_id));
   };
   const loadPairs = async () => {
-    const supabase = createClient()!;
+    const supabase = createClient();
+    if (!supabase) return;
     const { data } = await supabase.from("perfect_together").select("id,item_a_id,item_b_id,title").order("display_order", { ascending: true });
     setPairList((data || []).map((d: any) => ({ id: d.id, a: d.item_a_id, b: d.item_b_id, title: d.title || "" })));
   };
