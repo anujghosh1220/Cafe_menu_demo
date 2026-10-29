@@ -39,4 +39,3 @@ export function FeaturedDishes() {
     </section>
   );
 }
-EOF

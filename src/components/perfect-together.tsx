@@ -43,4 +43,3 @@ export function PerfectTogether() {
     </section>
   );
 }
-EOF
