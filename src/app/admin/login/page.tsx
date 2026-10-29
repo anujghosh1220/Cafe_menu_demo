@@ -11,7 +11,7 @@ export default function LoginPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
+    const supabase = createClient()!;
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); return; }
     router.push("/admin");
