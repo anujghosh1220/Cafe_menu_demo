@@ -11,7 +11,7 @@ function validWhatsapp(n: string) {
 export function CartDrawer() {
   const { lines, setQty, remove, clear } = useCart();
   const { state } = useAdmin();
-  const whatsappNumber = state.whatsapp;
+  const whatsappNumber = process.env.NEXT_PUBLIC_CAFE_WHATSAPP_NUMBER || state.whatsapp;
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
 
