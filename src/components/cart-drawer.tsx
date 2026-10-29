@@ -36,7 +36,6 @@ export function CartDrawer() {
   const submit = () => {
     const e: Record<string, string> = {};
     if (!table) e.table = "Table required";
-    if (!phone.trim()) e.phone = "Phone required";
     setErrors(e);
     if (Object.keys(e).length) return;
     if (!validWhatsapp(whatsappNumber)) {
@@ -48,8 +47,7 @@ export function CartDrawer() {
       .join("\n");
     const msg = `NEW DINE-IN ORDER - MAISON ELISE
 
-Table: ${table}
-Phone: ${phone}
+Table: ${table}${phone.trim() ? `\nPhone: ${phone}` : ""}
 
 ORDER ITEMS
 ${itemsText}
@@ -124,11 +122,6 @@ Please confirm availability and order acceptance.`;
                   <option value="Table 5">Table 5</option>
                 </select>
                 {errors.table && <p className="text-xs text-red-700">{errors.table}</p>}
-              </div>
-              <div>
-                <label className="text-sm">Phone</label>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2" />
-                {errors.phone && <p className="text-xs text-red-700">{errors.phone}</p>}
               </div>
               <div>
                 <label className="text-sm">Special Instructions (Optional)</label>
