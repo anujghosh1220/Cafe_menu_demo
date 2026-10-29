@@ -6,7 +6,7 @@ import type { MenuItem } from "@/data/menu";
 
 export default function AdminPage() {
   const { state, setState } = useAdmin();
-  const [tab, setTab] = useState<"menu" | "tables" | "settings">("menu");
+  const [tab, setTab] = useState<"menu" | "tables" | "settings" | "favourites" | "pairings">("menu");
   const [name, setName] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
   const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "saving" | "">("");
@@ -32,7 +32,24 @@ export default function AdminPage() {
   const waChanged = normalizeWa(waInput.trim()) !== state.whatsapp;
   const [price, setPrice] = useState("");
   const [cat, setCat] = useState(state.categories[0].id);
-  const [desc, setDesc] = useState("");
+  const [favIds, setFavIds] = useState<string[]>([]);
+  const [pairList, setPairList] = useState<{ id: number; a: string; b: string; title: string }[]>([]);
+  const [favToAdd, setFavToAdd] = useState("");
+  const [pairA, setPairA] = useState("");
+  const [pairB, setPairB] = useState("");
+  const [pairTitle, setPairTitle] = useState("");
+
+  const loadFavs = async () => {
+    const supabase = createClient();
+    const { data } = await supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true });
+    setFavIds((data || []).map((d: any) => d.menu_item_id));
+  };
+  const loadPairs = async () => {
+    const supabase = createClient();
+    const { data } = await supabase.from("perfect_together").select("id,item_a_id,item_b_id,title").order("display_order", { ascending: true });
+    setPairList((data || []).map((d: any) => ({ id: d.id, a: d.item_a_id, b: d.item_b_id, title: d.title || "" })));
+  };
+  useEffect(() => { loadFavs(); loadPairs(); }, []);
 
   const addItem = () => {
     if (!name.trim() || !price) return;
@@ -78,7 +95,7 @@ export default function AdminPage() {
       </div>
       <p className="text-xs text-[#5A4A4D] mt-2">No-login demo. Changes stored in this browser only.</p>
       <div className="flex gap-2 mt-4">
-        {(["menu","tables","settings"] as const).map((t) => (
+        {(["menu","tables","settings","favourites","pairings"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={`px-3 py-1 border ${tab===t?"bg-[#512B32] text-[#FFF2E7]":"border-[#D5B47A]/40"}`}>{t}</button>
         ))}
       </div>
@@ -136,6 +153,74 @@ export default function AdminPage() {
           </p>
         </section>
       )}
-    </main>
+      {tab === "favourites" && (
+        <section className="mt-6 space-y-2">
+          <div className="flex gap-2">
+            <select value={favToAdd} onChange={(e)=>setFavToAdd(e.target.value)} className="border p-2">
+              <option value="">Select item</option>
+              {state.items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+            </select>
+            <button onClick={async () => {
+              if (!favToAdd) return;
+              const supabase = createClient();
+              await supabase.from("homepage_favourites").insert({ menu_item_id: favToAdd, display_order: favIds.length });
+              setFavToAdd(""); loadFavs();
+            }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add</button>
+          </div>
+          {favIds.map((id, idx) => {
+            const item = state.items.find((i) => i.id === id);
+            return (
+              <div key={id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
+                <span className="flex-1">{item?.name || id}</span>
+                <button onClick={async () => {
+                  const supabase = createClient();
+                  await supabase.from("homepage_favourites").delete().eq("menu_item_id", id);
+                  loadFavs();
+                }} className="text-xs text-red-700">Remove</button>
+              </div>
+            );
+          })}
+          {favIds.length === 0 && <p className="text-sm text-[#5A4A4D]">No favourites.</p>}
+        </section>
+      )}
+
+      {tab === "pairings" && (
+        <section className="mt-6 space-y-2">
+          <div className="flex gap-2 flex-wrap">
+            <select value={pairA} onChange={(e)=>setPairA(e.target.value)} className="border p-2">
+              <option value="">Item A</option>
+              {state.items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+            </select>
+            <select value={pairB} onChange={(e)=>setPairB(e.target.value)} className="border p-2">
+              <option value="">Item B</option>
+              {state.items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+            </select>
+            <input placeholder="Title" value={pairTitle} onChange={(e)=>setPairTitle(e.target.value)} className="border p-2" />
+            <button onClick={async () => {
+              if (!pairA || !pairB || pairA === pairB) return;
+              const supabase = createClient();
+              await supabase.from("perfect_together").insert({ item_a_id: pairA, item_b_id: pairB, title: pairTitle, display_order: pairList.length });
+              setPairA(""); setPairB(""); setPairTitle(""); loadPairs();
+            }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Pairing</button>
+          </div>
+          {pairList.map((p) => {
+            const a = state.items.find((i) => i.id === p.a);
+            const b = state.items.find((i) => i.id === p.b);
+            return (
+              <div key={p.id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
+                <span className="flex-1">{a?.name} + {b?.name}</span>
+                <button onClick={async () => {
+                  const supabase = createClient();
+                  await supabase.from("perfect_together").delete().eq("id", p.id);
+                  loadPairs();
+                }} className="text-xs text-red-700">Remove</button>
+              </div>
+            );
+          })}
+          {pairList.length === 0 && <p className="text-sm text-[#5A4A4D]">No pairings.</p>}
+        </section>
+      )}
+
+      </main>
   );
 }
