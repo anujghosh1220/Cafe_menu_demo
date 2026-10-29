@@ -1,10 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useCart } from "@/components/cart-provider";
-import { menuItems } from "@/data/menu";
+import { useAdmin } from "@/components/admin-provider";
 import { formatINR } from "@/lib/format-currency";
-
-const whatsappNumber = process.env.NEXT_PUBLIC_CAFE_WHATSAPP_NUMBER || "";
 
 function validWhatsapp(n: string) {
   return /^\d{7,15}$/.test(n);
@@ -12,6 +10,8 @@ function validWhatsapp(n: string) {
 
 export function CartDrawer() {
   const { lines, setQty, remove, clear } = useCart();
+  const { state } = useAdmin();
+  const whatsappNumber = state.whatsapp;
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -32,7 +32,7 @@ export function CartDrawer() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const resolved = lines.map((l) => {
-    const item = menuItems.find((m) => m.id === l.itemId)!;
+    const item = state.items.find((m) => m.id === l.itemId)!;
     return { ...l, item, lineTotal: item.price * l.quantity };
   });
   const subtotal = resolved.reduce((s, r) => s + r.lineTotal, 0);
@@ -120,11 +120,7 @@ Please confirm availability and order acceptance.`;
                 <label className="text-sm">Table Number</label>
                 <select value={table} onChange={(e) => setTable(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2">
                   <option value="">Select a table</option>
-                  <option value="Table 1">Table 1</option>
-                  <option value="Table 2">Table 2</option>
-                  <option value="Table 3">Table 3</option>
-                  <option value="Table 4">Table 4</option>
-                  <option value="Table 5">Table 5</option>
+                  {state.tables.map((t) => <option key={t.id} value={t.name}>{t.name}</option>)}
                 </select>
                 {errors.table && <p className="text-xs text-red-700">{errors.table}</p>}
               </div>

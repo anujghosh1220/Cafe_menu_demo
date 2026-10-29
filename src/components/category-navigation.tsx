@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { menuCategories } from "@/data/menu";
+import type { Category } from "@/data/menu";
 
-export function CategoryNavigation() {
+export function CategoryNavigation({ categories }: { categories: Category[] }) {
   const [active, setActive] = useState<string>("");
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -13,17 +13,17 @@ export function CategoryNavigation() {
       },
       { rootMargin: "-40% 0px -55% 0px" },
     );
-    menuCategories.forEach((c) => {
+    categories.forEach((c) => {
       const el = document.getElementById(c.id);
       if (el) obs.observe(el);
     });
     return () => obs.disconnect();
-  }, []);
+  }, [categories]);
 
   return (
     <nav className="sticky top-0 bg-[#FFF2E7] z-10 border-b border-[#D5B47A]/30">
       <div className="flex gap-2 overflow-x-auto px-4 py-3">
-        {menuCategories.map((c) => (
+        {categories.map((c) => (
           <a
             key={c.id}
             href={`#${c.id}`}
