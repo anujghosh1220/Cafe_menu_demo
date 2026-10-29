@@ -6,8 +6,9 @@ import type { MenuItem } from "@/data/menu";
 export default function AdminPage() {
   const { state, setState } = useAdmin();
   const [tab, setTab] = useState<"menu" | "tables" | "settings">("menu");
-  useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
+  const [waInput, setWaInput] = useState(state.whatsapp);
   const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "">("");
+  useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
 
   const normalizeWa = (v: string) => v.replace(/[^\d]/g, "");
   const saveWa = () => {
