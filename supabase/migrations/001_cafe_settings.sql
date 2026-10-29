@@ -1,0 +1,1 @@
+create table if not exists public.cafe_settings (id int primary key default 1, whatsapp_number text); alter table public.cafe_settings enable row level security; create policy read_settings on public.cafe_settings for select to anon using (true); insert into public.cafe_settings (id, whatsapp_number) values (1, null) on conflict (id) do nothing;
