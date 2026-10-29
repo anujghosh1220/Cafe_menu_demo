@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { useAdmin } from "@/components/admin-provider";
+import { createClient } from "@/lib/supabase/client";
 import { formatINR } from "@/lib/format-currency";
 
 function validWhatsapp(n: string) {
@@ -11,7 +12,7 @@ function validWhatsapp(n: string) {
 export function CartDrawer() {
   const { lines, setQty, remove, clear } = useCart();
   const { state } = useAdmin();
-  const whatsappNumber = process.env.NEXT_PUBLIC_CAFE_WHATSAPP_NUMBER || state.whatsapp;
+  let whatsappNumber = process.env.NEXT_PUBLIC_CAFE_WHATSAPP_NUMBER || state.whatsapp;
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -38,14 +39,21 @@ export function CartDrawer() {
   const subtotal = resolved.reduce((s, r) => s + r.lineTotal, 0);
   const count = lines.reduce((s, l) => s + l.quantity, 0);
 
-  const submit = () => {
+  const submit = async () => {
     const e: Record<string, string> = {};
     if (!table) e.table = "Table required";
     setErrors(e);
     if (Object.keys(e).length) return;
     if (!validWhatsapp(whatsappNumber)) {
-      alert("WhatsApp number not configured.");
-      return;
+      // try supabase
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.from("cafe_settings").select("whatsapp_number").limit(1).single();
+        if (error) { console.error(error); alert("Could not load WhatsApp configuration."); return; }
+        const n = (data?.whatsapp_number || "").replace(/[^\d]/g, "");
+        if (!n) { alert("WhatsApp number not configured."); return; }
+        whatsappNumber = n;
+      } catch (e) { console.error(e); alert("Could not load WhatsApp configuration."); return; }
     }
     const itemsText = resolved
       .map((r, i) => `${i + 1}. ${r.item.name} x ${r.quantity} - ${formatINR(r.lineTotal)}`)
