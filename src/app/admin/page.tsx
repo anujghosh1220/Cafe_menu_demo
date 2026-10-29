@@ -40,10 +40,13 @@ export default function AdminPage() {
   const [pairB, setPairB] = useState("");
   const [pairTitle, setPairTitle] = useState("");
 
+  const [favError, setFavError] = useState("");
   const loadFavs = async () => {
     const supabase = createClient();
-    if (!supabase) return;
-    const { data } = await supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true });
+    if (!supabase) { setFavError("Supabase not configured"); return; }
+    const { data, error } = await supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true });
+    if (error) { setFavError(error.message); console.error(error); return; }
+    setFavError("");
     setFavIds((data || []).map((d: any) => d.menu_item_id));
   };
   const loadPairs = async () => {
@@ -184,6 +187,7 @@ export default function AdminPage() {
               </div>
             );
           })}
+          {favError && <p className="text-sm text-red-700">{favError}</p>}
           {favIds.length === 0 && <p className="text-sm text-[#5A4A4D]">No favourites.</p>}
         </section>
       )}
