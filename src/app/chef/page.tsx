@@ -10,11 +10,15 @@ export default function ChefDashboard() {
   useEffect(() => {
     const supabase = createClient();
     if (!supabase) return;
-    const load = async () => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/chef/login"); return; }
+      const { data: chef } = await supabase.from("chef_accounts").select("active").eq("user_id", user.id).single();
+      if (!chef || !chef.active) { router.push("/chef/login"); return; }
       const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
       setOrders(data || []);
     };
-    load();
+    init();
     const channel = supabase.channel("orders").on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
       setOrders((prev) => [payload.new, ...prev]);
     }).subscribe();
