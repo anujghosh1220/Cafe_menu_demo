@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAdmin } from "@/components/admin-provider";
 import type { MenuItem } from "@/data/menu";
@@ -18,7 +18,8 @@ export default function AdminPage() {
     const { data } = await supabase.from("chef_accounts").select("*").order("name", { ascending: true });
     setChefs(data || []);
   };
-  const [chefPass, setChefPass] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [chefConfirm, setChefConfirm] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
   const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "saving" | "">("");
@@ -247,8 +248,18 @@ export default function AdminPage() {
           <div className="flex gap-2 flex-wrap">
             <input placeholder="Name" value={chefName} onChange={(e)=>setChefName(e.target.value)} className="border p-2" />
             <input placeholder="Email" value={chefEmail} onChange={(e)=>setChefEmail(e.target.value)} className="border p-2" />
-            <input type="password" placeholder="Password" value={chefPass} onChange={(e)=>setChefPass(e.target.value)} className="border p-2" />
-            <input type="password" placeholder="Confirm" value={chefConfirm} onChange={(e)=>setChefConfirm(e.target.value)} className="border p-2" />
+            <div className="relative">
+              <input type={showPassword ? "text" : "password"} placeholder="Password" value={chefPass} onChange={(e)=>setChefPass(e.target.value)} className="border p-2 pr-10" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 -translate-y-1/2">
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            <div className="relative">
+              <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm" value={chefConfirm} onChange={(e)=>setChefConfirm(e.target.value)} className="border p-2 pr-10" />
+              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"} className="absolute right-2 top-1/2 -translate-y-1/2">
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             <button onClick={async () => {
               if (!chefName || !chefEmail || !chefPass || chefPass !== chefConfirm) { alert("Invalid"); return; }
               const res = await fetch("/api/admin/chef", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: chefName, email: chefEmail, password: chefPass }) });
