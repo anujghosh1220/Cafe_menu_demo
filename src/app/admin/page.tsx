@@ -18,7 +18,7 @@ export default function AdminPage() {
     const { data } = await supabase.from("chef_accounts").select("*").order("name", { ascending: true });
     setChefs(data || []);
   };
-  const [showPassword, setShowPassword] = useState(false);
+  const [chefPass, setChefPass] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [chefConfirm, setChefConfirm] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
@@ -267,7 +267,7 @@ export default function AdminPage() {
               setChefName(""); setChefEmail(""); setChefPass(""); setChefConfirm(""); loadChefs();
             }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Chef</button>
           </div>
-          {chefs.map((c) => (
+          {chefs.map((c: any) => (
             <div key={c.id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
               <span className="flex-1">{c.name} — {c.email} ({c.active ? "Active" : "Disabled"})</span>
               <button onClick={async () => {
