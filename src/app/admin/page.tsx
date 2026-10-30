@@ -45,7 +45,7 @@ export default function AdminPage() {
     const supabase = createClient();
     if (!supabase) { setFavError("Supabase not configured"); return; }
     const { data, error } = await supabase.from("homepage_favourites").select("menu_item_id").order("display_order", { ascending: true });
-    if (error) { setFavError(error.message); console.error(error); return; }
+    if (error) { setFavError(error.message || JSON.stringify(error)); console.error("loadFavs error", error); return; }
     setFavError("");
     setFavIds((data || []).map((d: any) => d.menu_item_id));
   };
