@@ -72,6 +72,16 @@ Special Instructions: ${notes}` : ""}
 
 Please confirm availability and order acceptance.`;
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+    const supabase = createClient();
+    if (supabase) {
+      await supabase.from("orders").insert({
+        table_number: table,
+        items: resolved.map((r) => ({ name: r.item.name, qty: r.quantity, price: r.item.price })),
+        total: subtotal,
+        special_instructions: notes.trim() || null,
+        status: "new",
+      });
+    }
     window.open(url, "_blank");
   };
 
