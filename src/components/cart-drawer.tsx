@@ -5,32 +5,29 @@ import { useAdmin } from "@/components/admin-provider";
 import { createClient } from "@/lib/supabase/client";
 import { formatINR } from "@/lib/format-currency";
 
-function validWhatsapp(n: string) {
-  return /^\d{7,15}$/.test(n);
-}
-
 export function CartDrawer() {
   const { lines, setQty, remove, clear } = useCart();
   const { state } = useAdmin();
-  let whatsappNumber = process.env.NEXT_PUBLIC_CAFE_WHATSAPP_NUMBER || state.whatsapp;
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [checkout, setCheckout] = useState(false);
+  const [checkoutClosing, setCheckoutClosing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
+
+  const [table, setTable] = useState("");
+  const [notes, setNotes] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const close = () => {
     setClosing(true);
     setTimeout(() => { setOpen(false); setClosing(false); }, 300);
   };
-  const [checkout, setCheckout] = useState(false);
-  const [checkoutClosing, setCheckoutClosing] = useState(false);
   const closeCheckout = () => {
     setCheckoutClosing(true);
     setTimeout(() => { setCheckout(false); setCheckoutClosing(false); }, 200);
   };
-
-  const [table, setTable] = useState("");
-  const [phone, setPhone] = useState("");
-  const [notes, setNotes] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const resolved = lines.map((l) => {
     const item = state.items.find((m) => m.id === l.itemId)!;
@@ -40,57 +37,38 @@ export function CartDrawer() {
   const count = lines.reduce((s, l) => s + l.quantity, 0);
 
   const submit = async () => {
+    if (saving) return;
+    if (resolved.length === 0) return;
     const e: Record<string, string> = {};
     if (!table) e.table = "Table required";
     setErrors(e);
     if (Object.keys(e).length) return;
-    if (!validWhatsapp(whatsappNumber)) {
-      // try supabase
-      try {
-        const supabase = createClient();
-        if (!supabase) { alert("WhatsApp number not configured."); return; }
-        const { data, error } = await supabase.from("cafe_settings").select("whatsapp_number").limit(1).single();
-        if (error) { console.error(error); alert("Could not load WhatsApp configuration."); return; }
-        const n = (data?.whatsapp_number || "").replace(/[^\d]/g, "");
-        if (!n) { alert("WhatsApp number not configured."); return; }
-        whatsappNumber = n;
-      } catch (e) { console.error(e); alert("Could not load WhatsApp configuration."); return; }
-    }
-    const itemsText = resolved
-      .map((r, i) => `${i + 1}. ${r.item.name} x ${r.quantity} - ${formatINR(r.lineTotal)}`)
-      .join("\n");
-    const msg = `NEW DINE-IN ORDER - MAISON ELISE
 
-Table: ${table}${phone.trim() ? `\nPhone: ${phone}` : ""}
-
-ORDER ITEMS
-${itemsText}
-
-Total: ${formatINR(subtotal)}${notes.trim() ? `
-
-Special Instructions: ${notes}` : ""}
-
-Please confirm availability and order acceptance.`;
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
-    const supabase = createClient();
-    if (supabase) {
-      await supabase.from("orders").insert({
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      if (!supabase) { alert("Supabase not configured"); return; }
+      const { data, error } = await supabase.from("orders").insert({
         table_number: table,
         items: resolved.map((r) => ({ name: r.item.name, qty: r.quantity, price: r.item.price })),
         total: subtotal,
         special_instructions: notes.trim() || null,
         status: "new",
-      });
+      }).select().single();
+      if (error) { alert("Failed to save order"); console.error(error); return; }
+      setConfirmedOrder(data);
+      setConfirmOpen(true);
+      setCheckout(false);
+      closeCheckout();
+      clear();
+    } finally {
+      setSaving(false);
     }
-    window.open(url, "_blank");
   };
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-4 right-4 z-40 bg-[#512B32] text-[#FFF2E7] px-4 py-2"
-      >
+      <button onClick={() => setOpen(true)} className="fixed bottom-4 right-4 z-40 bg-[#512B32] text-[#FFF2E7] px-4 py-2">
         Cart ({count})
       </button>
 
@@ -148,13 +126,29 @@ Please confirm availability and order acceptance.`;
                 <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full border border-[#D5B47A]/40 p-2" />
               </div>
               <p className="text-sm text-[#342025]">Total: {formatINR(subtotal)}</p>
-              <button onClick={submit} className="w-full py-2 bg-[#512B32] text-[#FFF2E7]">Proceed to Order</button>
-              <button onClick={() => closeCheckout()} className="w-full py-2 border border-[#D5B47A]/40 text-[#342025]">Back to Cart</button>
+              <button onClick={submit} disabled={saving} className="w-full py-2 bg-[#512B32] text-[#FFF2E7]">{saving ? "Placing Order..." : "Proceed to Order"}</button>
+              <button onClick={closeCheckout} className="w-full py-2 border border-[#D5B47A]/40 text-[#342025]">Back to Cart</button>
             </div>
-            <p className="text-xs text-[#5A4A4D] mt-3">Opening WhatsApp does not confirm the order. Send the message and wait for cafe confirmation.</p>
+          </div>
+        </div>
+      )}
+
+      {confirmOpen && confirmedOrder && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+          <div className="bg-[#FFF2E7] w-full max-w-md p-4">
+            <h2 className="font-serif text-xl text-[#512B32]">Order Confirmed!</h2>
+            <p className="text-sm mt-2">Order ID: {confirmedOrder.id}</p>
+            <p className="text-sm">Table: {confirmedOrder.table_number}</p>
+            <ul className="text-sm mt-2">
+              {(confirmedOrder.items || []).map((it: any, i: number) => <li key={i}>{it.qty} × {it.name}</li>)}
+            </ul>
+            <p className="text-sm mt-2">Total: {formatINR(confirmedOrder.total)}</p>
+            {confirmedOrder.special_instructions && <p className="text-sm">Instructions: {confirmedOrder.special_instructions}</p>}
+            <button onClick={() => { setConfirmOpen(false); setConfirmedOrder(null); }} className="mt-4 w-full py-2 bg-[#512B32] text-[#FFF2E7]">Done</button>
           </div>
         </div>
       )}
     </>
   );
 }
+EOF
