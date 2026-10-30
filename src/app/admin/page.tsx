@@ -9,7 +9,14 @@ export default function AdminPage() {
   const [tab, setTab] = useState<"menu" | "tables" | "settings" | "favourites" | "pairings" | "chef">("menu");
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  const [chefEmail, setChefEmail] = useState("");
+  const [chefs, setChefs] = useState<any[]>([]);
+  const [chefName, setChefName] = useState("");
+  const loadChefs = async () => {
+    const supabase = createClient();
+    if (!supabase) return;
+    const { data } = await supabase.from("chef_accounts").select("*").order("name", { ascending: true });
+    setChefs(data || []);
+  };
   const [chefPass, setChefPass] = useState("");
   const [chefConfirm, setChefConfirm] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
@@ -58,7 +65,7 @@ export default function AdminPage() {
     const { data } = await supabase.from("perfect_together").select("id,item_a_id,item_b_id,title").order("display_order", { ascending: true });
     setPairList((data || []).map((d: any) => ({ id: d.id, a: d.item_a_id, b: d.item_b_id, title: d.title || "" })));
   };
-  useEffect(() => { loadFavs(); loadPairs(); }, []);
+  useEffect(() => { loadFavs(); loadPairs(); loadChefs(); }, []);
 
   const addItem = () => {
     if (!name.trim() || !price) return;
@@ -235,16 +242,30 @@ export default function AdminPage() {
 
       {tab === "chef" && (
         <section className="mt-6 space-y-2">
-          <h2 className="font-serif text-xl text-[#512B32]">Chef Credentials</h2>
-          <input placeholder="Chef email" value={chefEmail} onChange={(e)=>setChefEmail(e.target.value)} className="w-full border p-2" />
-          <input type="password" placeholder="Password" value={chefPass} onChange={(e)=>setChefPass(e.target.value)} className="w-full border p-2" />
-          <input type="password" placeholder="Confirm password" value={chefConfirm} onChange={(e)=>setChefConfirm(e.target.value)} className="w-full border p-2" />
-          <button onClick={async () => {
-            if (!chefEmail || !chefPass || chefPass !== chefConfirm) { alert("Invalid"); return; }
-            const res = await fetch("/api/admin/chef", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: chefEmail, password: chefPass }) });
-            if (!res.ok) { alert("Failed"); return; }
-            alert("Saved");
-          }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Save Changes</button>
+          <h2 className="font-serif text-xl text-[#512B32]">Chef Management</h2>
+          <div className="flex gap-2 flex-wrap">
+            <input placeholder="Name" value={chefName} onChange={(e)=>setChefName(e.target.value)} className="border p-2" />
+            <input placeholder="Email" value={chefEmail} onChange={(e)=>setChefEmail(e.target.value)} className="border p-2" />
+            <input type="password" placeholder="Password" value={chefPass} onChange={(e)=>setChefPass(e.target.value)} className="border p-2" />
+            <input type="password" placeholder="Confirm" value={chefConfirm} onChange={(e)=>setChefConfirm(e.target.value)} className="border p-2" />
+            <button onClick={async () => {
+              if (!chefName || !chefEmail || !chefPass || chefPass !== chefConfirm) { alert("Invalid"); return; }
+              const res = await fetch("/api/admin/chef", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: chefName, email: chefEmail, password: chefPass }) });
+              if (!res.ok) { alert("Failed"); return; }
+              setChefName(""); setChefEmail(""); setChefPass(""); setChefConfirm(""); loadChefs();
+            }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Chef</button>
+          </div>
+          {chefs.map((c) => (
+            <div key={c.id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
+              <span className="flex-1">{c.name} — {c.email} ({c.active ? "Active" : "Disabled"})</span>
+              <button onClick={async () => {
+                if (!confirm("Remove chef?")) return;
+                await fetch("/api/admin/chef", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: c.email }) });
+                loadChefs();
+              }} className="text-xs text-red-700">Remove</button>
+            </div>
+          ))}
+          {chefs.length === 0 && <p className="text-sm text-[#5A4A4D]">No chefs.</p>}
         </section>
       )}
 
