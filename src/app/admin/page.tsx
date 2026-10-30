@@ -6,9 +6,12 @@ import type { MenuItem } from "@/data/menu";
 
 export default function AdminPage() {
   const { state, setState } = useAdmin();
-  const [tab, setTab] = useState<"menu" | "tables" | "settings" | "favourites" | "pairings">("menu");
+  const [tab, setTab] = useState<"menu" | "tables" | "settings" | "favourites" | "pairings" | "chef">("menu");
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
+  const [chefEmail, setChefEmail] = useState("");
+  const [chefPass, setChefPass] = useState("");
+  const [chefConfirm, setChefConfirm] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
   const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "saving" | "">("");
   useEffect(() => { setWaInput(state.whatsapp); }, [state.whatsapp]);
@@ -101,7 +104,7 @@ export default function AdminPage() {
       </div>
       <p className="text-xs text-[#5A4A4D] mt-2">No-login demo. Changes stored in this browser only.</p>
       <div className="flex gap-2 mt-4">
-        {(["menu","tables","settings","favourites","pairings"] as const).map((t) => (
+        {(["menu","tables","settings","favourites","pairings","chef"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)} className={`px-3 py-1 border ${tab===t?"bg-[#512B32] text-[#FFF2E7]":"border-[#D5B47A]/40"}`}>{t}</button>
         ))}
       </div>
@@ -227,6 +230,21 @@ export default function AdminPage() {
             );
           })}
           {pairList.length === 0 && <p className="text-sm text-[#5A4A4D]">No pairings.</p>}
+        </section>
+      )}
+
+      {tab === "chef" && (
+        <section className="mt-6 space-y-2">
+          <h2 className="font-serif text-xl text-[#512B32]">Chef Credentials</h2>
+          <input placeholder="Chef email" value={chefEmail} onChange={(e)=>setChefEmail(e.target.value)} className="w-full border p-2" />
+          <input type="password" placeholder="Password" value={chefPass} onChange={(e)=>setChefPass(e.target.value)} className="w-full border p-2" />
+          <input type="password" placeholder="Confirm password" value={chefConfirm} onChange={(e)=>setChefConfirm(e.target.value)} className="w-full border p-2" />
+          <button onClick={async () => {
+            if (!chefEmail || !chefPass || chefPass !== chefConfirm) { alert("Invalid"); return; }
+            const res = await fetch("/api/admin/chef", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: chefEmail, password: chefPass }) });
+            if (!res.ok) { alert("Failed"); return; }
+            alert("Saved");
+          }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Save Changes</button>
         </section>
       )}
 
