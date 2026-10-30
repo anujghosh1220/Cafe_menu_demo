@@ -8,11 +8,22 @@ create table if not exists public.chef_accounts (
 
 alter table public.chef_accounts enable row level security;
 
-create policy "chef_accounts_read_admin" on public.chef_accounts for select to authenticated
+drop policy if exists "chef_accounts_read_admin" on public.chef_accounts;
+create policy "chef_accounts_read_admin"
+  on public.chef_accounts for select
+  to authenticated
   using (auth.uid() = '8102fac5-eae6-4c8e-8062-488454f2ad3f'::uuid);
 
-create policy "chef_accounts_read_self" on public.chef_accounts for select to authenticated
+drop policy if exists "chef_accounts_read_self" on public.chef_accounts;
+create policy "chef_accounts_read_self"
+  on public.chef_accounts for select
+  to authenticated
   using (user_id = auth.uid());
+
+drop policy if exists "chef_accounts_admin_write" on public.chef_accounts;
+create policy "chef_accounts_admin_write"
+  on public.chef_accounts for all
+  to authenticated
   using (auth.uid() = '8102fac5-eae6-4c8e-8062-488454f2ad3f'::uuid)
   with check (auth.uid() = '8102fac5-eae6-4c8e-8062-488454f2ad3f'::uuid);
 EOF
