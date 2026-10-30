@@ -10,7 +10,5 @@ create table if not exists public.orders (
 
 alter table public.orders enable row level security;
 
-create policy "orders_insert_anon" on public.orders for insert to anon, authenticated with check (true);
-create policy "orders_select_admin_chef" on public.orders for select to authenticated using (true);
-create policy "orders_update_chef" on public.orders for update to authenticated using (true) with check (true);
+create policy if not exists "orders_insert_anon" on public.orders for insert to anon, authenticated with check (true);
 EOF
