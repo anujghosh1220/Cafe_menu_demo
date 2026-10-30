@@ -7,6 +7,8 @@ export default function ChefDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const router = useRouter();
 
+  const [connected, setConnected] = useState("Connecting…");
+
   useEffect(() => {
     const supabase = createClient();
     if (!supabase) return;
@@ -19,10 +21,28 @@ export default function ChefDashboard() {
       setOrders(data || []);
     };
     init();
-    const channel = supabase.channel("orders").on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
-      setOrders((prev) => [payload.new, ...prev]);
-    }).subscribe();
-    return () => { supabase.removeChannel(channel); };
+
+    const channel = supabase.channel("orders").on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload) => {
+      setOrders((prev) => {
+        if (payload.eventType === "INSERT") return [payload.new, ...prev.filter((o) => o.id !== payload.new.id)];
+        if (payload.eventType === "UPDATE") return prev.map((o) => (o.id === payload.new.id ? payload.new : o));
+        if (payload.eventType === "DELETE") return prev.filter((o) => o.id !== payload.old.id);
+        return prev;
+      });
+    }).subscribe((status) => {
+      setConnected(status === "SUBSCRIBED" ? "Live updates connected" : "Reconnecting…");
+    });
+
+    // polling fallback
+    const interval = setInterval(async () => {
+      const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+      if (data) setOrders(data);
+    }, 20000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const logout = async () => {
@@ -42,7 +62,10 @@ export default function ChefDashboard() {
     <main className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center">
         <h1 className="font-serif text-2xl text-[#512B32]">Chef Dashboard</h1>
-        <button onClick={logout} className="text-sm text-[#5A4A4D]">Logout</button>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-[#5A4A4D]">{connected}</span>
+          <button onClick={logout} className="text-sm text-[#5A4A4D]">Logout</button>
+        </div>
       </div>
       <div className="mt-6 space-y-4">
         {orders.map((o) => (
