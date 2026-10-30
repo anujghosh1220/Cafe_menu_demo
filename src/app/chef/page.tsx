@@ -87,8 +87,8 @@ export default function ChefDashboard() {
                 {completing.has(o.id) ? "Completing..." : "Complete Order"}
               </button>
             )}
-            {completing.has(o.id) && (
-              <div className="absolute inset-y-0 left-1/2 w-px bg-[#D5B47A] animate-pulse" />
+            {(o.status === "completed" || completing.has(o.id)) && (
+              <div className="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 bg-[#D5B47A] z-10" style={{ transform: "translateX(-50%)" }} />
             )}
           </div>
         ))}
