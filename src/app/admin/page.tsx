@@ -11,6 +11,7 @@ export default function AdminPage() {
   const [desc, setDesc] = useState("");
   const [chefs, setChefs] = useState<any[]>([]);
   const [chefName, setChefName] = useState("");
+  const [chefEmail, setChefEmail] = useState("");
   const loadChefs = async () => {
     const supabase = createClient();
     if (!supabase) return;

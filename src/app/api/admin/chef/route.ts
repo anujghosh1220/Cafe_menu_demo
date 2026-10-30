@@ -40,8 +40,3 @@ export async function DELETE(req: Request) {
   await supabase.from("chef_accounts").update({ active: false }).eq("email", email);
   return NextResponse.json({ ok: true });
 }
-EOF
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-  return NextResponse.json({ ok: true });
-}
