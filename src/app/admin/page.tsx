@@ -188,7 +188,7 @@ export default function AdminPage() {
               setFavToAdd(""); loadFavs();
             }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add</button>
           </div>
-          {favIds.map((id, idx) => {
+          {favIds.map((id: string, idx: number) => {
             const item = state.items.find((i) => i.id === id);
             return (
               <div key={id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
@@ -226,7 +226,7 @@ export default function AdminPage() {
               setPairA(""); setPairB(""); setPairTitle(""); loadPairs();
             }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Pairing</button>
           </div>
-          {pairList.map((p) => {
+          {pairList.map((p: any) => {
             const a = state.items.find((i) => i.id === p.a);
             const b = state.items.find((i) => i.id === p.b);
             return (
