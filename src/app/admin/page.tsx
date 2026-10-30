@@ -266,7 +266,8 @@ export default function AdminPage() {
             <button onClick={async () => {
               if (!chefName || !chefEmail || !chefPass || chefPass !== chefConfirm) { alert("Invalid"); return; }
               const res = await fetch("/api/admin/chef", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: chefName, email: chefEmail, password: chefPass }) });
-              if (!res.ok) { alert("Failed"); return; }
+              const json = await res.json();
+              if (!res.ok) { alert(json.error || "Failed"); return; }
               setChefName(""); setChefEmail(""); setChefPass(""); setChefConfirm(""); loadChefs();
             }} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Chef</button>
           </div>
