@@ -32,3 +32,5 @@ body {
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 .animate-fade-out { animation: fadeOut 0.2s ease-in; }
 @media (prefers-reduced-motion: reduce) { .animate-fade-out { animation: none; } }
+
+@keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }

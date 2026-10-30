@@ -52,6 +52,7 @@ export default function ChefDashboard() {
   };
 
   const [completing, setCompleting] = useState<Set<string>>(new Set());
+  const [justCompleted, setJustCompleted] = useState<Set<string>>(new Set());
 
   const completeOrder = async (id: string) => {
     if (completing.has(id)) return;
@@ -62,6 +63,7 @@ export default function ChefDashboard() {
     setCompleting((s) => { const n = new Set(s); n.delete(id); return n; });
     if (error) { alert("Failed"); return; }
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: "completed" } : o)));
+    setJustCompleted((s) => new Set(s).add(id));
   };
 
   return (
@@ -75,7 +77,7 @@ export default function ChefDashboard() {
       </div>
       <div className="mt-6 space-y-4">
         {orders.map((o) => (
-          <div key={o.id} className={`border border-[#D5B47A]/40 p-4 bg-[#FFF2E7] relative ${o.status === "completed" ? "opacity-50 pointer-events-none" : ""}`}>
+          <div key={o.id} className="border border-[#D5B47A]/40 p-4 bg-[#FFF2E7] relative" style={{ opacity: o.status === "completed" ? 0.35 : 1, transition: "opacity 0.5s ease 0.8s" }}>
             <p className="text-sm text-[#5A4A4D]">Table: {o.table_number} · {new Date(o.created_at).toLocaleString()}</p>
             <p className="text-[#342025] font-medium mt-1">Total: {o.total}</p>
             <ul className="text-sm mt-2">
@@ -88,7 +90,7 @@ export default function ChefDashboard() {
               </button>
             )}
             {(o.status === "completed" || completing.has(o.id)) && (
-              <div className="pointer-events-none absolute -left-4 -right-4 top-1/2 h-0.5 bg-[#D5B47A] z-10" style={{ transform: "translateY(-50%)" }} />
+              <div className="pointer-events-none absolute -left-4 -right-4 top-1/2 h-0.5 bg-[#D5B47A] z-10 origin-left" style={{ transform: justCompleted.has(o.id) ? "scaleX(1)" : "scaleX(1)", animation: justCompleted.has(o.id) ? "drawLine 0.75s cubic-bezier(0.22,1,0.36,1) forwards" : "none" }} />
             )}
           </div>
         ))}
