@@ -33,4 +33,11 @@ body {
 .animate-fade-out { animation: fadeOut 0.2s ease-in; }
 @media (prefers-reduced-motion: reduce) { .animate-fade-out { animation: none; } }
 
-@keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
