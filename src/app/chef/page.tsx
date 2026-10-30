@@ -88,7 +88,7 @@ export default function ChefDashboard() {
               </button>
             )}
             {(o.status === "completed" || completing.has(o.id)) && (
-              <div className="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 bg-[#D5B47A] z-10" style={{ transform: "translateX(-50%)" }} />
+              <div className="pointer-events-none absolute -left-4 -right-4 top-1/2 h-0.5 bg-[#D5B47A] z-10" style={{ transform: "translateY(-50%)" }} />
             )}
           </div>
         ))}
