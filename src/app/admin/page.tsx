@@ -21,7 +21,7 @@ export default function AdminPage() {
   const [chefPass, setChefPass] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [chefConfirm, setChefConfirm] = useState("");
   const [waInput, setWaInput] = useState(state.whatsapp);
   const [waStatus, setWaStatus] = useState<"saved" | "unsaved" | "invalid" | "saving" | "">("");
