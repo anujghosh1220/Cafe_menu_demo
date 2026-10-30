@@ -1,14 +1,14 @@
 create table if not exists public.homepage_favourites (
   id bigserial primary key,
-  menu_item_id text references public.menu_items(id) on delete cascade,
+  menu_item_id text not null,
   display_order int not null default 0,
   unique (menu_item_id)
 );
 
 create table if not exists public.perfect_together (
   id bigserial primary key,
-  item_a_id text references public.menu_items(id) on delete cascade,
-  item_b_id text references public.menu_items(id) on delete cascade,
+  item_a_id text not null,
+  item_b_id text not null,
   display_order int not null default 0,
   title text
 );
