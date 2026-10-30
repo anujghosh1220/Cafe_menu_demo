@@ -21,7 +21,8 @@ export async function POST(req: Request) {
     }
   }
   if (userId) {
-    await supabase.from("chef_accounts").upsert({ user_id: userId, name, email, active: true }, { onConflict: "email" });
+    const { error: upsertErr } = await supabase.from("chef_accounts").upsert({ user_id: userId, name, email, active: true }, { onConflict: "email" });
+    if (upsertErr) return NextResponse.json({ error: upsertErr.message }, { status: 400 });
   }
   return NextResponse.json({ ok: true });
 }

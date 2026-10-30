@@ -13,10 +13,13 @@ export default function AdminPage() {
   const [chefs, setChefs] = useState<any[]>([]);
   const [chefName, setChefName] = useState("");
   const [chefEmail, setChefEmail] = useState("");
+  const [chefError, setChefError] = useState("");
   const loadChefs = async () => {
     const supabase = createClient();
-    if (!supabase) return;
-    const { data } = await supabase.from("chef_accounts").select("*").order("name", { ascending: true });
+    if (!supabase) { setChefError("Supabase not configured"); return; }
+    const { data, error } = await supabase.from("chef_accounts").select("*").order("name", { ascending: true });
+    if (error) { setChefError(error.message); console.error(error); return; }
+    setChefError("");
     setChefs(data || []);
   };
   const [chefPass, setChefPass] = useState("");
@@ -281,6 +284,7 @@ export default function AdminPage() {
               }} className="text-xs text-red-700">Remove</button>
             </div>
           ))}
+          {chefError && <p className="text-sm text-red-700">{chefError}</p>}
           {chefs.length === 0 && <p className="text-sm text-[#5A4A4D]">No chefs.</p>}
         </section>
       )}
