@@ -55,7 +55,7 @@ export function CartDrawer() {
         special_instructions: notes.trim() || null,
         status: "new",
       }).select().single();
-      if (error) { alert("Failed to save order"); console.error(error); return; }
+      if (error) { alert("Failed to save order"); console.error("order insert error", { message: error.message, code: (error as any).code, details: (error as any).details, hint: (error as any).hint }); return; }
       setConfirmedOrder(data);
       setConfirmOpen(true);
       setCheckout(false);
