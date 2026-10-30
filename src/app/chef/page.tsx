@@ -51,11 +51,17 @@ export default function ChefDashboard() {
     router.push("/chef/login");
   };
 
-  const updateStatus = async (id: string, status: string) => {
+  const [completing, setCompleting] = useState<Set<string>>(new Set());
+
+  const completeOrder = async (id: string) => {
+    if (completing.has(id)) return;
+    setCompleting((s) => new Set(s).add(id));
     const supabase = createClient();
-    if (!supabase) return;
-    await supabase.from("orders").update({ status }).eq("id", id);
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    if (!supabase) { setCompleting((s) => { const n = new Set(s); n.delete(id); return n; }); return; }
+    const { error } = await supabase.from("orders").update({ status: "completed" }).eq("id", id);
+    setCompleting((s) => { const n = new Set(s); n.delete(id); return n; });
+    if (error) { alert("Failed"); return; }
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: "completed" } : o)));
   };
 
   return (
@@ -69,18 +75,21 @@ export default function ChefDashboard() {
       </div>
       <div className="mt-6 space-y-4">
         {orders.map((o) => (
-          <div key={o.id} className="border border-[#D5B47A]/40 p-4 bg-[#FFF2E7]">
+          <div key={o.id} className={`border border-[#D5B47A]/40 p-4 bg-[#FFF2E7] relative ${o.status === "completed" ? "opacity-50 pointer-events-none" : ""}`}>
             <p className="text-sm text-[#5A4A4D]">Table: {o.table_number} · {new Date(o.created_at).toLocaleString()}</p>
             <p className="text-[#342025] font-medium mt-1">Total: {o.total}</p>
             <ul className="text-sm mt-2">
               {(o.items || []).map((it: any, i: number) => <li key={i}>{it.qty} × {it.name}</li>)}
             </ul>
-            {o.special_instructions && <p className="text-sm mt-2">Instructions: {o.special_instructions}</p>}
-            <div className="flex gap-2 mt-3 flex-wrap">
-              {["accepted","preparing","ready","completed"].map((s) => (
-                <button key={s} onClick={() => updateStatus(o.id, s)} className="text-xs px-3 py-1 border border-[#D5B47A]/40">{s}</button>
-              ))}
-            </div>
+            {o.status === "completed" && <p className="text-xs text-[#D5B47A] mt-2">Completed</p>}
+            {o.status !== "completed" && (
+              <button disabled={completing.has(o.id)} onClick={() => completeOrder(o.id)} className="mt-3 px-3 py-1 bg-[#512B32] text-[#FFF2E7] text-sm disabled:opacity-50">
+                {completing.has(o.id) ? "Completing..." : "Complete Order"}
+              </button>
+            )}
+            {completing.has(o.id) && (
+              <div className="absolute inset-y-0 left-1/2 w-px bg-[#D5B47A] animate-pulse" />
+            )}
           </div>
         ))}
         {orders.length === 0 && <p className="text-[#5A4A4D]">No orders.</p>}
