@@ -2,31 +2,32 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import LoginCard from "@/components/ui/login-card";
 
 export default function ChefLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = async (email: string, password: string) => {
+    setError("");
     const supabase = createClient();
     if (!supabase) { setError("Supabase not configured"); return; }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setError(error.message); return; }
+    setLoading(true);
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (err) { setError(err.message); return; }
     router.push("/chef");
   };
 
   return (
-    <main className="max-w-sm mx-auto px-4 py-20">
-      <h1 className="font-serif text-2xl text-[#512B32]">Chef Login</h1>
-      <form onSubmit={submit} className="mt-6 space-y-3">
-        <input type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Email" className="w-full border p-2" />
-        <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="Password" className="w-full border p-2" />
-        {error && <p className="text-sm text-red-700">{error}</p>}
-        <button type="submit" className="w-full py-2 bg-[#512B32] text-[#FFF2E7]">Sign in</button>
-      </form>
-    </main>
+    <LoginCard
+      variant="chef"
+      title="Chef Login"
+      description="Sign in to manage kitchen orders"
+      onSubmit={submit}
+      isLoading={loading}
+      error={error}
+    />
   );
 }
