@@ -153,8 +153,8 @@ export default function AdminPage() {
       {tab === "menu" && (
         <section className="mt-6">
           <div className="border border-[#D5B47A]/40 p-4 space-y-2">
-            <input placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} className="w-full border p-2" />
-            <input placeholder="Price" value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full border p-2" />
+            <input placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} className="w-full border border-[#D5B47A]/40 rounded-lg p-2 bg-white/60 focus:outline-none focus:border-[#512B32]" />
+            <input placeholder="Price" value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full border border-[#D5B47A]/40 rounded-lg p-2 bg-white/60 focus:outline-none focus:border-[#512B32]" />
             <select value={cat} onChange={(e)=>setCat(e.target.value)} className="w-full border p-2">
               {state.categories.map((c)=> <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
