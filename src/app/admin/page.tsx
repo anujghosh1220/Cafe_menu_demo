@@ -163,7 +163,7 @@ export default function AdminPage() {
           </div>
           <div className="mt-6 space-y-2">
             {state.items.map((i) => (
-              <div key={i.id} className="flex items-center gap-2 border-b border-[#D5B47A]/30 py-2">
+              <div key={i.id} className="flex items-center gap-3 border border-[#D5B47A]/30 rounded-lg px-3 py-2 hover:bg-[#FFF2E7] transition">
                 <span className="flex-1 text-sm">{i.name}</span>
                 <input defaultValue={i.price} onBlur={(e)=>updatePrice(i.id,e.target.value)} className="w-20 border p-1" />
                 <button onClick={()=>removeItem(i.id)} className="text-xs text-red-700">Delete</button>
