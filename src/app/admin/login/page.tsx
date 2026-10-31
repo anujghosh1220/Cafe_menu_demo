@@ -26,6 +26,7 @@ export default function LoginPage() {
         {error && <p className="text-sm text-red-700">{error}</p>}
         <button type="submit" className="w-full py-2 bg-[#512B32] text-[#FFF2E7]">Sign in</button>
       </form>
+      <p className="mt-4 text-sm"><a href="/admin/forgot-password" className="text-[#5A4A4D] hover:text-[#512B32]">Forgot password?</a></p>
     </main>
   );
 }
