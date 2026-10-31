@@ -21,6 +21,8 @@ export default function AdminPage() {
     router.push("/admin/login");
   };
   const [tab, setTab] = useState<"menu" | "tables" | "settings" | "favourites" | "pairings" | "chef">("menu");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [chefs, setChefs] = useState<any[]>([]);
@@ -162,7 +164,12 @@ export default function AdminPage() {
             <button onClick={addItem} className="px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add Item</button>
           </div>
           <div className="mt-6 space-y-2">
-            {state.items.map((i) => (
+            <input placeholder="Search menu..." value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} className="w-full border border-[#D5B47A]/40 rounded-lg p-2 bg-white/60 focus:outline-none focus:border-[#512B32] mb-2" />
+            <select value={categoryFilter} onChange={(e)=>setCategoryFilter(e.target.value)} className="w-full border border-[#D5B47A]/40 rounded-lg p-2 bg-white/60 focus:outline-none focus:border-[#512B32] mb-2">
+              <option value="">All categories</option>
+              {state.categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            {state.items.filter((i) => (!searchTerm || i.name.toLowerCase().includes(searchTerm.toLowerCase())) && (!categoryFilter || i.categoryId === categoryFilter)).map((i) => (
               <div key={i.id} className="flex items-center gap-3 border border-[#D5B47A]/30 rounded-lg px-3 py-2 hover:bg-[#FFF2E7] transition">
                 <span className="flex-1 text-sm">{i.name}</span>
                 <input defaultValue={i.price} onBlur={(e)=>updatePrice(i.id,e.target.value)} className="w-20 border p-1" />
