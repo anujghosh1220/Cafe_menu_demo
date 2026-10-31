@@ -32,11 +32,11 @@ export function PerfectTogether() {
       <p className="text-sm text-[#5A4A4D] mt-1">A little something to make your favourite even better.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {resolved.map((p: any, i: number) => (
-          <div key={i} className="border border-[#D5B47A]/40 p-4 bg-[#FFF2E7]">
+          <div key={i} className="border border-[#D5B47A]/40 p-5 bg-[#FFF2E7] rounded-2xl shadow-sm hover:shadow-md transition">
             <p className="text-[#342025] font-medium">{p.a.name} + {p.b.name}</p>
-            <div className="flex items-center justify-between mt-3">
-              <span className="text-[#512B32]">{formatINR(p.total)}</span>
-              <button onClick={() => { add(p.a.id); add(p.b.id); }} className="text-xs px-3 py-1 bg-[#512B32] text-[#FFF2E7]">Add both</button>
+            <div className="flex items-center justify-between mt-4">
+              <span className="text-[#512B32] font-serif">{formatINR(p.total)}</span>
+              <button onClick={() => { add(p.a.id); add(p.b.id); }} className="text-xs px-4 py-2 bg-[#512B32] text-[#FFF2E7] rounded-full hover:bg-[#342025] transition active:scale-95">Add both</button>
             </div>
           </div>
         ))}
