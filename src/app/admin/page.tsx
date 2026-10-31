@@ -126,6 +126,20 @@ export default function AdminPage() {
 
   return (
     <DashboardShell title="Maison Elise — Admin" onLogout={logout}>
+      <section className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="rounded-xl border border-[#D5B47A]/30 bg-white/40 p-4">
+          <p className="text-xs text-[#5A4A4D]">Menu Items</p>
+          <p className="text-2xl font-serif text-[#512B32]">{state.items.length}</p>
+        </div>
+        <div className="rounded-xl border border-[#D5B47A]/30 bg-white/40 p-4">
+          <p className="text-xs text-[#5A4A4D]">Tables</p>
+          <p className="text-2xl font-serif text-[#512B32]">{state.tables.length}</p>
+        </div>
+        <div className="rounded-xl border border-[#D5B47A]/30 bg-white/40 p-4">
+          <p className="text-xs text-[#5A4A4D]">WhatsApp</p>
+          <p className="text-2xl font-serif text-[#512B32]">{state.whatsapp ? "Configured" : "Not set"}</p>
+        </div>
+      </section>
       <p className="text-xs text-[#5A4A4D] mt-2">No-login demo. Changes stored in this browser only.</p>
       <div className="flex gap-2 mt-4">
         {(["menu","tables","settings","favourites","pairings","chef"] as const).map((t) => (
