@@ -68,7 +68,7 @@ export function CartDrawer() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="fixed bottom-4 right-4 z-40 bg-[#512B32] text-[#FFF2E7] px-4 py-2">
+      <button onClick={() => setOpen(true)} className="fixed bottom-4 right-4 z-40 bg-[#512B32] text-[#FFF2E7] px-5 py-2.5 rounded-full shadow-lg hover:bg-[#342025] transition">
         Cart ({count})
       </button>
 
