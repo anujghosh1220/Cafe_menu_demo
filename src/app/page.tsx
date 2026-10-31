@@ -26,7 +26,7 @@ export default function Home() {
   return (
     <>
     <div className="min-h-screen bg-[#FFF2E7]">
-      <main className="w-full max-w-[1320px] mx-auto px-6" id="top">
+        <main className="w-full max-w-[1320px] mx-auto px-4 sm:px-6" id="top">
         <MenuHeader />
         <MenuHero />
         <FeaturedDishes />
