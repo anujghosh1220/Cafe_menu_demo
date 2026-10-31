@@ -21,12 +21,12 @@ export function FeaturedDishes() {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-10">
+    <section className="py-8">
       <h2 className="font-serif text-2xl text-[#512B32]">Maison Élise Favourites</h2>
       <p className="text-sm text-[#5A4A4D] mt-1">A few things we think you'll love.</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         {items.map((item: any) => (
-          <a key={item.id} href={`#${item.id}`} className="border border-[#D5B47A]/40 p-4 block bg-[#FFF2E7] rounded-xl hover:shadow-lg transition">
+          <a key={item.id} href={`#${item.id}`} className="group border border-[#D5B47A]/40 p-4 block bg-[#FFF2E7] rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition">
             <span className="text-[10px] uppercase tracking-widest text-[#512B32]">House Favourite</span>
             <h3 className="font-medium text-[#342025] mt-2">{item.name}</h3>
             <p className="text-sm text-[#5A4A4D] mt-1 line-clamp-2">{item.description}</p>
