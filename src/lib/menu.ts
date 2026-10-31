@@ -4,10 +4,11 @@ export type MenuItemRow = {
   id: string;
   name: string;
   price: number;
-  category_id: string | null;
+  category: string | null;
   description: string | null;
   image_url: string | null;
-  available: boolean;
+  sort_order: number;
+  is_available: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -15,7 +16,7 @@ export type MenuItemRow = {
 export async function fetchMenuItems() {
   const supabase = createClient();
   if (!supabase) return [];
-  const { data, error } = await supabase.from("menu_items").select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("menu_items").select("*").order("sort_order", { ascending: true });
   if (error) throw error;
   return (data || []) as MenuItemRow[];
 }
