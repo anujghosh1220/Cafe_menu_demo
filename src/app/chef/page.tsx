@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import DashboardShell from "@/components/dashboard-shell";
 
 type Order = any;
 
@@ -172,13 +173,9 @@ export default function ChefDashboard() {
   };
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center">
-        <h1 className="font-serif text-2xl text-[#512B32]">Chef Dashboard</h1>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-[#5A4A4D]">{connected}</span>
-          <button onClick={logout} className="text-sm text-[#5A4A4D]">Logout</button>
-        </div>
+    <DashboardShell title="Chef Dashboard" onLogout={logout}>
+      <div className="flex justify-end items-center mb-4">
+        <span className="text-xs text-[#5A4A4D]">{connected}</span>
       </div>
       <div className="mt-6 space-y-4">
         {orders.map((o) => (
@@ -201,6 +198,6 @@ export default function ChefDashboard() {
         ))}
         {orders.length === 0 && <p className="text-[#5A4A4D]">No orders.</p>}
       </div>
-    </main>
+    </DashboardShell>
   );
 }

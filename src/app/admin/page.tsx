@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, LogOut } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "@/components/admin-provider";
+import DashboardShell from "@/components/dashboard-shell";
 import type { MenuItem } from "@/data/menu";
 
 export default function AdminPage() {
@@ -124,17 +125,7 @@ export default function AdminPage() {
   };
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center">
-        <h1 className="font-serif text-2xl text-[#512B32]">Maison Elise — Admin</h1>
-        <div className="flex items-center gap-3">
-          <a href="/" className="text-sm text-[#5A4A4D]">Back to menu</a>
-          <button onClick={logout} disabled={loggingOut} className="flex items-center gap-1 text-sm text-[#5A4A4D] hover:text-[#512B32] disabled:opacity-50">
-            <LogOut className="w-4 h-4" />
-            {loggingOut ? "Logging out..." : "Log out"}
-          </button>
-        </div>
-      </div>
+    <DashboardShell title="Maison Elise — Admin" onLogout={logout}>
       <p className="text-xs text-[#5A4A4D] mt-2">No-login demo. Changes stored in this browser only.</p>
       <div className="flex gap-2 mt-4">
         {(["menu","tables","settings","favourites","pairings","chef"] as const).map((t) => (
@@ -307,7 +298,7 @@ export default function AdminPage() {
         </section>
       )}
 
-      </main>
+      </DashboardShell>
   );
 }
 
