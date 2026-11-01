@@ -21,7 +21,7 @@ export function CategoryNavigation({ categories }: { categories: Category[] }) {
   }, [categories]);
 
   return (
-    <nav className="sticky top-0 z-10 bg-[#FFF2E7]/90 backdrop-blur border-b border-[#D5B47A]/30">
+    <nav className="sticky top-0 z-10 bg-[#FFF2E7]/95 backdrop-blur-sm border-b border-[#D5B47A]/30">
       <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-none">
         {categories.map((c) => (
           <a

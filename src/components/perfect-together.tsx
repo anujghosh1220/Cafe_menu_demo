@@ -4,18 +4,40 @@ import { useCart } from "@/components/cart-provider";
 import { useAdmin } from "@/components/admin-provider";
 import { createClient } from "@/lib/supabase/client";
 import { formatINR } from "@/lib/format-currency";
+import { Loader2 } from "lucide-react";
 
 export function PerfectTogether() {
   const { add } = useCart();
   const { state } = useAdmin();
   const [pairings, setPairings] = useState<{ a: string; b: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    if (!supabase) return;
-    supabase.from("perfect_together").select("item_a_id,item_b_id").order("display_order", { ascending: true })
-      .then(({ data }) => setPairings((data || []).map((d: any) => ({ a: d.item_a_id, b: d.item_b_id }))));
+    if (!supabase) { setLoading(false); return; }
+    (async () => {
+      try {
+        const { data } = await supabase.from("perfect_together").select("item_a_id,item_b_id").order("display_order", { ascending: true });
+        setPairings((data || []).map((d: any) => ({ a: d.item_a_id, b: d.item_b_id })));
+      } catch (error) {
+        console.error("Error loading pairings:", error);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
+
+  if (loading) {
+    return (
+      <section className="py-8">
+        <h2 className="font-serif text-2xl text-[#512B32]">Perfect Together</h2>
+        <p className="text-sm text-[#5A4A4D] mt-1">A little something to make your favourite even better.</p>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 text-[#D5B47A] animate-spin" />
+        </div>
+      </section>
+    );
+  }
 
   const resolved = pairings.map((p) => {
     const a = state.items.find((m) => m.id === p.a);

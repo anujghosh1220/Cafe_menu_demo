@@ -20,7 +20,9 @@ body {
 }
 
 .font-serif { font-family: var(--font-serif), Georgia, serif; }
-@keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } } .animate-aurora { animation: aurora 60s linear infinite; }
+
+@keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.animate-aurora { animation: aurora 60s linear infinite; }
 
 @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -41,3 +43,32 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Admin Animation System */
+@keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.animate-slide-in-left { animation: slideInLeft 0.3s ease-out; }
+.animate-slide-up { animation: slideUp 0.4s ease-out; }
+.animate-scale-in { animation: scaleIn 0.3s ease-out; }
+.animate-shimmer { animation: shimmer 2s infinite linear; background: linear-gradient(90deg, transparent, rgba(213,180,122,0.1), transparent); background-size: 200% 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in-left, .animate-slide-up, .animate-scale-in, .animate-shimmer { animation: none; }
+}
+
+/* Staggered animation delays */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-delay-100, .animate-delay-200, .animate-delay-300, .animate-delay-400 { animation-delay: 0ms; }
+}
+
+

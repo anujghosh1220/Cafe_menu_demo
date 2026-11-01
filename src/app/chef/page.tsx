@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import DashboardShell from "@/components/dashboard-shell";
+import ChefDashboardShell from "@/components/chef-dashboard-shell";
+import { Check, Clock, ChefHat, Utensils, AlertCircle, Flame, Circle, Package } from "lucide-react";
 
 type Order = any;
 
@@ -43,7 +44,6 @@ export default function ChefDashboard() {
         const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
         if (cancelled || !mountedRef.current) return;
         if (data) {
-          // reconcile buffered realtime events received before/during fetch
           const buffered = bufferRef.current;
           bufferRef.current = [];
           const merged = [...data];
@@ -94,7 +94,6 @@ export default function ChefDashboard() {
           .channel("orders-chef")
           .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload) => {
             if (!mountedRef.current) return;
-            // buffer if not yet subscribed? We'll apply directly; fetch reconciles.
             applyEvent(payload);
           })
           .subscribe((status, err) => {
@@ -102,9 +101,7 @@ export default function ChefDashboard() {
             if (status === "SUBSCRIBED") {
               setConnected("Live");
               backoffRef.current = 1000;
-              // fetch after subscription active
               fetchOrders();
-              // reconnect reconciliation
             } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
               setConnected("Reconnecting…");
               scheduleReconnect();
@@ -131,7 +128,6 @@ export default function ChefDashboard() {
 
       connect();
 
-      // polling fallback 12s
       pollingRef.current = setInterval(() => {
         fetchOrders();
       }, 12000);
@@ -158,7 +154,6 @@ export default function ChefDashboard() {
   };
 
   const [completing, setCompleting] = useState<Set<string>>(new Set());
-  const [justCompleted, setJustCompleted] = useState<Set<string>>(new Set());
 
   const completeOrder = async (id: string) => {
     if (completing.has(id)) return;
@@ -169,35 +164,139 @@ export default function ChefDashboard() {
     setCompleting((s) => { const n = new Set(s); n.delete(id); return n; });
     if (error) { alert("Failed"); return; }
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: "completed" } : o)));
-    setJustCompleted((s) => new Set(s).add(id));
+  };
+
+  const pendingOrders = orders.filter(o => o.status !== "completed");
+  const completedOrders = orders.filter(o => o.status === "completed");
+
+  const getElapsedTime = (createdAt: string) => {
+    const now = Date.now();
+    const created = new Date(createdAt).getTime();
+    const elapsed = Math.floor((now - created) / 60000);
+    if (elapsed < 1) return "Just now";
+    if (elapsed < 60) return `${elapsed}m ago`;
+    const hours = Math.floor(elapsed / 60);
+    return `${hours}h ago`;
   };
 
   return (
-    <DashboardShell title="Chef Dashboard" onLogout={logout}>
-      <div className="flex justify-end items-center mb-4">
-        <span className="text-xs text-[#5A4A4D]">{connected}</span>
-      </div>
-      <div className="mt-6 space-y-4">
-        {orders.map((o) => (
-          <div key={o.id} className="border border-[#D5B47A]/40 p-4 bg-[#FFF2E7] relative" style={{ opacity: o.status === "completed" ? 0.35 : 1, transition: "opacity 0.5s ease 0.8s" }}>
-            <p className="text-sm text-[#5A4A4D]">Table: {o.table_number} · {new Date(o.created_at).toLocaleString()}</p>
-            <p className="text-[#342025] font-medium mt-1">Total: {o.total}</p>
-            <ul className="text-sm mt-2">
-              {(o.items || []).map((it: any, i: number) => <li key={i}>{it.qty} × {it.name}</li>)}
-            </ul>
-            {o.status === "completed" && <p className="text-xs text-[#D5B47A] mt-2">Completed</p>}
-            {o.status !== "completed" && (
-              <button disabled={completing.has(o.id)} onClick={() => completeOrder(o.id)} className="mt-3 px-3 py-1 bg-[#512B32] text-[#FFF2E7] text-sm disabled:opacity-50">
-                {completing.has(o.id) ? "Completing..." : "Complete Order"}
-              </button>
-            )}
-            {o.status === "completed" && (
-              <div className="pointer-events-none absolute -left-4 -right-4 top-1/2 h-0.5 bg-[#D5B47A] z-10 origin-left" style={{ transform: justCompleted.has(o.id) ? "scaleX(0)" : "scaleX(1)", animation: justCompleted.has(o.id) ? "drawLine 0.75s cubic-bezier(0.22,1,0.36,1) forwards" : "none" }} />
-            )}
+    <ChefDashboardShell onLogout={logout} connectionStatus={connected}>
+      <div className="space-y-6 lg:space-y-8">
+        {pendingOrders.length === 0 && completedOrders.length === 0 && (
+          <div className="text-center py-16 lg:py-24">
+            <div className="w-20 h-20 rounded-2xl bg-[#512B32]/10 flex items-center justify-center mx-auto mb-6">
+              <ChefHat className="w-10 h-10 text-[#512B32]" />
+            </div>
+            <h2 className="font-serif text-2xl lg:text-3xl text-[#512B32] mb-2">Kitchen Ready</h2>
+            <p className="text-[#5A4A4D]">Orders will appear here in real-time</p>
           </div>
-        ))}
-        {orders.length === 0 && <p className="text-[#5A4A4D]">No orders.</p>}
+        )}
+
+        {pendingOrders.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4 lg:mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D5B47A] to-[#C99C91] flex items-center justify-center">
+                  <Flame className="w-5 h-5 text-[#342025]" />
+                </div>
+                <div>
+                  <h2 className="font-serif text-xl lg:text-2xl text-[#512B32]">Active Orders</h2>
+                  <p className="text-xs text-[#5A4A4D]">{pendingOrders.length} order{pendingOrders.length !== 1 ? 's' : ''} in progress</p>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
+              {pendingOrders.map((o, index) => (
+                <div key={o.id} className="bg-white/70 border border-[#D5B47A]/30 rounded-2xl p-5 lg:p-6 shadow-sm hover:shadow-lg hover:border-[#D5B47A] transition-all duration-300 animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#512B32] to-[#342025] flex items-center justify-center shadow-md">
+                        <span className="text-[#D5B47A] font-serif text-xl font-bold">{o.table_number}</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#342025]">Table {o.table_number}</p>
+                        <p className="text-xs text-[#5A4A4D] flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {getElapsedTime(o.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-[#D5B47A]/20 flex items-center justify-center">
+                      <Utensils className="w-4 h-4 text-[#D5B47A]" />
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-4">
+                    {(o.items || []).map((it: any, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-[#342025]">
+                        <span className="w-7 h-7 rounded-lg bg-[#D5B47A]/20 flex items-center justify-center text-xs text-[#512B32] font-bold flex-shrink-0">{it.qty}</span>
+                        <span className="flex-1">{it.name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {o.special_instructions && (
+                    <div className="mb-4 p-3 lg:p-4 bg-gradient-to-r from-[#C99C91]/20 to-[#D5B47A]/10 border border-[#C99C91]/30 rounded-xl">
+                      <p className="text-xs text-[#342025] flex items-start gap-2 font-medium">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#C99C91]" />
+                        <span>{o.special_instructions}</span>
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-4 border-t border-[#D5B47A]/20">
+                    <div>
+                      <p className="text-xs text-[#5A4A4D]">Total</p>
+                      <p className="font-serif text-xl lg:text-2xl text-[#512B32]">₹{o.total}</p>
+                    </div>
+                    <button
+                      disabled={completing.has(o.id)}
+                      onClick={() => completeOrder(o.id)}
+                      className="px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-[#512B32] to-[#342025] text-[#FFF2E7] rounded-xl hover:shadow-lg transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                    >
+                      {completing.has(o.id) ? (
+                        <>
+                          <Circle className="w-4 h-4 animate-spin" />
+                          <span>Completing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span className="font-medium">Complete</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {completedOrders.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4 lg:mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#342025]/10 flex items-center justify-center">
+                <Package className="w-5 h-5 text-[#5A4A4D]" />
+              </div>
+              <div>
+                <h2 className="font-serif text-xl lg:text-2xl text-[#342025]">Completed Orders</h2>
+                <p className="text-xs text-[#5A4A4D]">{completedOrders.length} order{completedOrders.length !== 1 ? 's' : ''} finished</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+              {completedOrders.map((o) => (
+                <div key={o.id} className="bg-white/40 border border-[#D5B47A]/20 rounded-xl p-4 opacity-60">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-[#342025]">Table {o.table_number}</p>
+                      <p className="text-xs text-[#5A4A4D]">{new Date(o.created_at).toLocaleTimeString()}</p>
+                    </div>
+                    <p className="font-serif text-lg text-[#512B32]">₹{o.total}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </DashboardShell>
+    </ChefDashboardShell>
   );
 }

@@ -28,19 +28,29 @@ export default function Home() {
     <div className="min-h-screen bg-[#FFF2E7]">
         <main className="w-full max-w-[1320px] mx-auto px-4 sm:px-6" id="top">
         <MenuHeader />
-        <MenuHero />
-        <FeaturedDishes />
-        <PerfectTogether />
-        <div className="my-4" id="menu">
+        <div className="py-8">
+          <MenuHero />
+        </div>
+        <div id="featured" className="py-8">
+          <FeaturedDishes />
+        </div>
+        <div id="perfect" className="py-8">
+          <PerfectTogether />
+        </div>
+        <div className="py-8" id="menu">
           <MenuSearch value={query} onChange={setQuery} />
         </div>
         {!query && <CategoryNavigation categories={categories} />}
-        <div className="mt-2">
+        <div className="py-6">
           {query ? (
             results.length === 0 ? (
-              <p className="text-center text-[#5A4A4D] py-10">No items match your search.</p>
+              <div className="text-center py-16">
+                <p className="text-[#5A4A4D] mb-2">No items match your search</p>
+                <p className="text-sm text-[#5A4A4D]/70">Try a different term or browse our categories</p>
+              </div>
             ) : (
               <section className="py-6">
+                <p className="text-sm text-[#5A4A4D] mb-4">{results.length} {results.length === 1 ? 'result' : 'results'} for "{query}"</p>
                 {categories.map((c) => {
                   const items = results.filter((i) => i.categoryId === c.id);
                   if (items.length === 0) return null;

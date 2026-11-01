@@ -5,9 +5,10 @@ import type { MenuItem } from "@/data/menu";
 
 export function MenuItemRow({ item }: { item: MenuItem }) {
   const { add } = useCart();
+
   return (
     <div id={item.id} className="group flex items-start justify-between gap-4 py-4 border-b border-[#D5B47A]/20 hover:bg-[#FFF2E7] transition rounded-lg px-2">
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="font-medium text-[#342025]">{item.name}</span>
           {item.vegetarian && (
