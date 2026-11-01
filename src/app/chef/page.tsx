@@ -63,6 +63,15 @@ export default function ChefDashboard() {
     const applyEvent = (payload: any) => {
       const ev = payload?.new || payload?.old;
       if (payload.eventType === "INSERT" && payload.new) {
+        const notified = new Set(JSON.parse(sessionStorage.getItem("chef_notified") || "[]"));
+        if (!notified.has(payload.new.id) && typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+          notified.add(payload.new.id);
+          sessionStorage.setItem("chef_notified", JSON.stringify(Array.from(notified)));
+          new Notification("Maison Élise — New Order!", {
+            body: `New order received from Table ${payload.new.table_number}. Tap to view.`,
+            tag: payload.new.id,
+          });
+        }
         setOrders((prev) => {
           if (prev.some((o) => o.id === payload.new.id)) return prev;
           return [payload.new, ...prev].sort((a, b) =>
@@ -182,6 +191,18 @@ export default function ChefDashboard() {
   return (
     <ChefDashboardShell onLogout={logout} connectionStatus={connected}>
       <div className="space-y-6 lg:space-y-8">
+        <div className="flex justify-end">
+          <button
+            onClick={async () => {
+              if (typeof window === "undefined" || !("Notification" in window)) return;
+              const p = await Notification.requestPermission();
+              alert(p === "granted" ? "Notifications enabled" : "Notifications blocked");
+            }}
+            className="text-xs px-4 py-2 border border-[#D5B47A]/40 rounded-full text-[#342025] hover:bg-[#FFF2E7] transition"
+          >
+            Enable Order Notifications
+          </button>
+        </div>
         {pendingOrders.length === 0 && completedOrders.length === 0 && (
           <div className="text-center py-16 lg:py-24">
             <div className="w-20 h-20 rounded-2xl bg-[#512B32]/10 flex items-center justify-center mx-auto mb-6">
