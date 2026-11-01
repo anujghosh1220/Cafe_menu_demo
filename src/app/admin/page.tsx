@@ -93,9 +93,22 @@ export default function AdminPage() {
   const addItem = async () => {
     if (!name.trim() || !price) return;
     try {
+      const supabase = createClient();
+      if (supabase) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("[admin diag] user exists:", !!user);
+        console.log("[admin diag] user id:", user?.id);
+        console.log("[admin diag] matches admin:", user?.id === "8102fac5-eae6-4c8e-8062-488454f2ad3f");
+        console.log("[admin diag] session exists:", !!session);
+        console.log("[admin diag] jwt role:", (session?.access_token ? JSON.parse(atob(session.access_token.split(".")[1]))?.role : undefined));
+      }
       await addMenuItem({ name: name.trim(), price: parseInt(price, 10), category: cat, description: desc.trim(), sort_order: state.items.length });
       setName(""); setPrice(""); setDesc("");
-    } catch (e) { alert("Failed to add item"); console.error(e); }
+    } catch (e: any) {
+      console.error("[admin diag] insert error:", { code: e?.code, message: e?.message, details: e?.details, hint: e?.hint });
+      alert("Failed to add item"); console.error(e);
+    }
   };
 
   const removeItem = async (id: string) => {
