@@ -162,15 +162,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="bg-[#512B32]/5 border border-[#D5B47A]/20 rounded-xl p-6">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-[#D5B47A] mt-0.5" />
-          <div>
-            <p className="font-medium text-[#342025] mb-1">Demo Mode</p>
-            <p className="text-sm text-[#5A4A4D]">Changes are stored in this browser only. To persist data, configure your Supabase backend.</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
