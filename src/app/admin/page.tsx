@@ -8,7 +8,7 @@ import DashboardShell from "@/components/dashboard-shell";
 import type { MenuItem } from "@/data/menu";
 
 export default function AdminPage() {
-  const { state, setState } = useAdmin();
+  const { state, setState, addMenuItem, deleteMenuItemById, updateMenuItemById } = useAdmin();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
   const logout = async () => {
@@ -90,30 +90,23 @@ export default function AdminPage() {
   };
   useEffect(() => { loadFavs(); loadPairs(); loadChefs(); }, []);
 
-  const addItem = () => {
+  const addItem = async () => {
     if (!name.trim() || !price) return;
-    const newItem: MenuItem = {
-      id: `item-${Date.now()}`,
-      categoryId: cat,
-      name: name.trim(),
-      description: desc.trim(),
-      price: parseInt(price, 10),
-      vegetarian: true,
-      available: true,
-    };
-    setState({ ...state, items: [...state.items, newItem] });
-    setName(""); setPrice(""); setDesc("");
+    try {
+      await addMenuItem({ name: name.trim(), price: parseInt(price, 10), category: cat, description: desc.trim(), sort_order: state.items.length });
+      setName(""); setPrice(""); setDesc("");
+    } catch (e) { alert("Failed to add item"); console.error(e); }
   };
 
-  const removeItem = (id: string) => {
+  const removeItem = async (id: string) => {
     if (!confirm("Delete this menu item? This action cannot be undone.")) return;
-    setState({ ...state, items: state.items.filter((i) => i.id !== id) });
+    try { await deleteMenuItemById(id); } catch (e) { alert("Failed to delete"); console.error(e); }
   };
 
-  const updatePrice = (id: string, p: string) => {
+  const updatePrice = async (id: string, p: string) => {
     const v = parseInt(p, 10);
     if (isNaN(v) || v < 0) return;
-    setState({ ...state, items: state.items.map((i) => (i.id === id ? { ...i, price: v } : i)) });
+    try { await updateMenuItemById(id, { price: v }); } catch (e) { alert("Failed to update price"); console.error(e); }
   };
 
   const addTable = () => {
