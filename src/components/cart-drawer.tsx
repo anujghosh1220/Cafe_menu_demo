@@ -80,7 +80,7 @@ export function CartDrawer() {
               <button onClick={close} className="text-sm text-[#5A4A4D] hover:text-[#512B32]">Close</button>
             </div>
             {resolved.length === 0 ? (
-              <p className="mt-6 text-[#5A4A4D]">Your cart is empty.</p>
+              <p className="mt-6 text-[#5A4A4D] text-center py-10">Your cart is empty.</p>
             ) : (
               <>
                 {resolved.map((r) => (
