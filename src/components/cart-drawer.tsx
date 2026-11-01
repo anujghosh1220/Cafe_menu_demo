@@ -90,10 +90,10 @@ export function CartDrawer() {
                       <span className="text-[#512B32]">{formatINR(r.lineTotal)}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-2">
-                      <button onClick={() => setQty(r.itemId, r.quantity - 1)}>-</button>
-                      <span>{r.quantity}</span>
-                      <button onClick={() => setQty(r.itemId, r.quantity + 1)}>+</button>
-                      <button onClick={() => remove(r.itemId)} className="ml-auto text-xs text-[#5A4A4D]">Remove</button>
+                      <button onClick={() => setQty(r.itemId, r.quantity - 1)} className="w-7 h-7 rounded-full border border-[#D5B47A]/40 text-[#342025] hover:bg-[#FFF2E7]">-</button>
+                      <span className="w-6 text-center">{r.quantity}</span>
+                      <button onClick={() => setQty(r.itemId, r.quantity + 1)} className="w-7 h-7 rounded-full border border-[#D5B47A]/40 text-[#342025] hover:bg-[#FFF2E7]">+</button>
+                      <button onClick={() => remove(r.itemId)} className="ml-auto text-xs text-[#5A4A4D] hover:text-red-700">Remove</button>
                     </div>
                   </div>
                 ))}
