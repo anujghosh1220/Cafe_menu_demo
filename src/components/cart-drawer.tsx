@@ -77,7 +77,7 @@ export function CartDrawer() {
           <div className={`bg-[#FFF2E7] w-full max-w-md h-full p-4 overflow-y-auto ${closing ? "translate-x-full transition-transform duration-300" : "animate-slide-in-right"}`}>
             <div className="flex justify-between items-center">
               <h2 className="font-serif text-xl text-[#512B32]">Your Cart</h2>
-              <button onClick={close}>Close</button>
+              <button onClick={close} className="text-sm text-[#5A4A4D] hover:text-[#512B32]">Close</button>
             </div>
             {resolved.length === 0 ? (
               <p className="mt-6 text-[#5A4A4D]">Your cart is empty.</p>
