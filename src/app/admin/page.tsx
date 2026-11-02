@@ -8,7 +8,7 @@ import DashboardShell from "@/components/dashboard-shell";
 import type { MenuItem } from "@/data/menu";
 
 export default function AdminPage() {
-  const { state, setState, addMenuItem, deleteMenuItemById, updateMenuItemById } = useAdmin();
+  const { state, setState, addMenuItem, deleteMenuItemById } = useAdmin();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
   const logout = async () => {
@@ -101,12 +101,6 @@ export default function AdminPage() {
   const removeItem = async (id: string) => {
     if (!confirm("Delete this menu item? This action cannot be undone.")) return;
     try { await deleteMenuItemById(id); } catch (e) { alert("Failed to delete"); console.error(e); }
-  };
-
-  const updatePrice = async (id: string, p: string) => {
-    const v = parseInt(p, 10);
-    if (isNaN(v) || v < 0) return;
-    try { await updateMenuItemById(id, { price: v }); } catch (e) { alert("Failed to update price"); console.error(e); }
   };
 
   const addTable = () => {
@@ -206,10 +200,7 @@ export default function AdminPage() {
                 <p className="text-sm text-[#5A4A4D] mt-1 line-clamp-1">{i.description}</p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="relative">
-                  <span className="text-sm text-[#5A4A4D] mr-2">₹</span>
-                  <input defaultValue={i.price} onBlur={(e)=>updatePrice(i.id,e.target.value)} className="w-20 border border-[#D5B47A]/40 rounded-lg p-2 text-center bg-white/80 focus:outline-none focus:border-[#512B32] transition" />
-                </div>
+                <span className="text-sm font-medium text-[#512B32]">₹{i.price}</span>
                 <button onClick={()=>removeItem(i.id)} className="p-2 text-red-700 hover:bg-red-50 rounded-lg transition" title="Delete">
                   <Trash2 className="w-4 h-4" />
                 </button>
